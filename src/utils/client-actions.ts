@@ -1,3 +1,4 @@
+"use client"
 export async function fetchInvoiceImage(filePath: string): Promise<{
     success: true;
     data: string;

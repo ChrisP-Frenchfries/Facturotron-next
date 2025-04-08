@@ -39,7 +39,7 @@ export async function uploadDocument(
         }
 
         const result: ApiResponseAdd = await response.json();
-        revalidatePath("/upload");
+
 
         return {
             message: result.message || "Document envoyé avec succès !",
