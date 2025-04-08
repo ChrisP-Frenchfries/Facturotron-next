@@ -1,20 +1,22 @@
-interface TextractDataRelationship {
+export interface TextractDataRelationship {
     Ids: string[];
     Type: string;
 }
 
-interface TextractDataGeometryBoundingBox {
+
+
+export interface TextractDataGeometryBoundingBox {
     Height: number;
     Left: number;
     Top: number;
     Width: number;
 }
 
-interface TextractDataGeometry {
+export interface TextractDataGeometry {
     BoundingBox: TextractDataGeometryBoundingBox;
 }
 
-interface TextractData {
+export interface TextractData {
     BlockType: string;
     Id: string;
     Relationships?: TextractDataRelationship[];
@@ -23,12 +25,12 @@ interface TextractData {
     Text?: string;
 }
 
-interface FormData {
+export interface FormData {
     userId: string;
     clientId: string;
 }
 
-interface ApiResponseAdd {
+export interface ApiResponseAdd {
     success: boolean;
     message: string;
     invoiceId: number;

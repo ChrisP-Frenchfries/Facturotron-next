@@ -1,15 +1,28 @@
 "use client";
 
+import { pathFileAtom } from "@/atom/facture.atom";
 import { uploadDocument } from "@/utils/facture.action";
-import { useActionState } from "react";
+import { useAtom } from "jotai";
+import { useActionState, useEffect } from "react";
 
 
 // Simulation d'une session (remplacez par votre système d'authentification)
 const getSessionUserId = () => "2"; // Exemple statique, à adapter
 
 export default function UploadForm() {
+
+    const [pathFile, setPathFile] = useAtom(pathFileAtom);
+
+
+
     const userId = getSessionUserId(); // Récupérer l'userId depuis la session
     const [state, formAction, isPending] = useActionState(uploadDocument, { message: null });
+
+    useEffect(() => {
+        if (state.filePath) {
+            setPathFile(state.filePath); // Met à jour l'atome avec le filePath retourné
+        }
+    }, [state.filePath, setPathFile]);
 
     return (
         <div className="container mx-auto p-4">
