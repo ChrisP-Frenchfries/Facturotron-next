@@ -1,13 +1,14 @@
-"use client";
+"use client"; // Nécessaire pour CanvasDrawing et useActionState
 
 import { invoiceIdAtom, pathFileAtom } from "@/atom/facture.atom";
-import { submitBoundingBoxes } from "@/utils/canvas.action";
-import { fetchInvoiceImage } from "@/utils/client-actions";
+import { makeInvoiceElements } from "@/utils/canvas.action";
+// Importer depuis le fichier serveur
 import { useAtom } from "jotai";
-import { useEffect, useState, useRef } from "react";
-import CanvasDrawing from "./CanvasDrawing"; // Import du nouveau composant
+import { useEffect, useRef, useState, startTransition } from "react";
+import { useActionState } from "react";
+import CanvasDrawing from "./CanvasDrawing";
+import { fetchInvoiceImage } from "@/utils/facture.action";
 
-// Typage pour BoundingBox
 interface BoundingBox {
     Top: number;
     Left: number;
@@ -23,39 +24,44 @@ type FetchResult = {
     error: string;
 };
 
+type SubmitResult = {
+    success: boolean;
+    message?: string;
+    error?: string;
+} | null;
+
 export default function DisplayFacture() {
     const [invoiceId] = useAtom(invoiceIdAtom);
     const [pathFile] = useAtom(pathFileAtom);
     const [imageUrl, setImageUrl] = useState<string | null>(null);
-    const [loading, setLoading] = useState(false);
-    const [error, setError] = useState<string | null>(null);
+    const [imageLoading, setImageLoading] = useState(false);
+    const [imageError, setImageError] = useState<string | null>(null);
     const [boundingBoxes, setBoundingBoxes] = useState<BoundingBox[]>([]);
     const imageRef = useRef<HTMLImageElement>(null);
 
-    // Charger l'image
     useEffect(() => {
         if (!pathFile) {
             setImageUrl(null);
-            setError(null);
-            setLoading(false);
+            setImageError(null);
+            setImageLoading(false);
             return;
         }
 
         let isMounted = true;
 
         const loadImage = async () => {
-            setLoading(true);
-            setError(null);
+            setImageLoading(true);
+            setImageError(null);
 
-            const result = await fetchInvoiceImage(pathFile);
+            const result = await fetchInvoiceImage(pathFile); // Appelle la Server Action
             if (isMounted) {
                 if (result.success) {
-                    setImageUrl(result.data);
+                    setImageUrl(result.data); // Base64 data URL
                 } else {
-                    setError(result.error);
+                    setImageError(result.error);
                     setImageUrl(null);
                 }
-                setLoading(false);
+                setImageLoading(false);
             }
         };
 
@@ -64,31 +70,34 @@ export default function DisplayFacture() {
         return () => {
             isMounted = false;
             if (imageUrl) {
-                URL.revokeObjectURL(imageUrl);
+                URL.revokeObjectURL(imageUrl); // Toujours valide si vous revenez à URL.createObjectURL côté client
             }
         };
     }, [pathFile]);
 
-    const handleSubmit = async () => {
+    const [submitState, submitAction, isPending] = useActionState<SubmitResult, BoundingBox[]>(
+        async (_previousState: SubmitResult, validBoxes: BoundingBox[]) => {
+            return await makeInvoiceElements(validBoxes);
+        },
+        null
+    );
+
+    const handleSubmit = () => {
         const validBoxes = boundingBoxes.filter((box) => box.Width > 0 && box.Height > 0);
         if (validBoxes.length === 0) {
-            setError("Aucune boîte valide à soumettre");
+            setImageError("Aucune boîte valide à soumettre");
             return;
         }
-
-        const result = await submitBoundingBoxes(validBoxes);
-        if (result.success) {
-            console.log("Bounding boxes soumises avec succès:", result.message);
-        } else {
-            setError(result.error);
-        }
+        startTransition(() => {
+            submitAction(validBoxes);
+        });
     };
 
     return (
         <div className="facture-display" style={{ userSelect: "none" }}>
-            {loading && <p>Chargement de l'image...</p>}
-            {error && <p className="error">Erreur : {error}</p>}
-            {imageUrl && !loading && (
+            {imageLoading && <p>Chargement de l'image...</p>}
+            {imageError && <p className="error">Erreur : {imageError}</p>}
+            {imageUrl && !imageLoading && (
                 <div style={{ position: "relative", display: "inline-block" }}>
                     <img
                         ref={imageRef}
@@ -97,7 +106,7 @@ export default function DisplayFacture() {
                         style={{ maxWidth: "100%", height: "auto" }}
                         draggable={false}
                         onError={() => {
-                            setError("Erreur lors du chargement de l'image");
+                            setImageError("Erreur lors du chargement de l'image");
                             setImageUrl(null);
                         }}
                     />
@@ -108,12 +117,15 @@ export default function DisplayFacture() {
                     />
                 </div>
             )}
-            {!pathFile && !loading && <p>Aucune facture sélectionnée</p>}
+            {!pathFile && !imageLoading && <p>Aucune facture sélectionnée</p>}
+            {submitState && !submitState.success && <p className="error">Erreur : {submitState.error}</p>}
+            {submitState && submitState.success && <p className="success">Succès : {submitState.message}</p>}
             <button
                 onClick={handleSubmit}
                 className="mt-4 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+                disabled={isPending}
             >
-                Soumettre les boîtes
+                {isPending ? "Soumission en cours..." : "Soumettre les boîtes"}
             </button>
         </div>
     );

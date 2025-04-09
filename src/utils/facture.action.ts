@@ -58,39 +58,49 @@ export async function uploadDocument(
 
 export async function fetchInvoiceImage(filePath: string): Promise<{
     success: true;
-    data: string;
+    data: string; // Base64
 } | {
     success: false;
     error: string;
 }> {
     try {
+        // const session = await getServerSession(authOptions);
+        // if (!session || !session.user) {
+        //     throw new Error("Utilisateur non authentifié");
+        // }
+
+        // const jwtToken = session.accessToken; // Récupérer le JWT
         const apiUrl = `http://localhost:4242/api/facture/image/?pathFile=${encodeURIComponent(filePath)}`;
         const response = await fetch(apiUrl, {
-            method: 'GET',
+            method: "GET",
             headers: {
-                'Accept': 'image/webp'
-            }
+                "Accept": "image/webp",
+                // "Authorization": `Bearer ${jwtToken}`,
+            },
         });
 
         if (!response.ok) {
             throw new Error(`Erreur HTTP ${response.status}: ${response.statusText}`);
         }
 
-        const contentType = response.headers.get('content-type');
-        if (!contentType || !contentType.includes('image/webp')) {
-            throw new Error('Le serveur n\'a pas retourné une image WebP');
+        const contentType = response.headers.get("content-type");
+        if (!contentType || !contentType.includes("image/webp")) {
+            throw new Error("Le serveur n'a pas retourné une image WebP");
         }
 
-        const imageData = await response.blob();
+        const imageData = await response.arrayBuffer(); // Récupérer les données brutes
+        const base64Image = Buffer.from(imageData).toString("base64");
+        const dataUrl = `data:image/webp;base64,${base64Image}`;
+
         return {
             success: true,
-            data: URL.createObjectURL(imageData)
+            data: dataUrl,
         };
     } catch (error: any) {
         console.error("Erreur dans fetchInvoiceImage:", error);
         return {
             success: false,
-            error: error.message || 'Une erreur inconnue est survenue'
+            error: error.message || "Une erreur inconnue est survenue",
         };
     }
 }
