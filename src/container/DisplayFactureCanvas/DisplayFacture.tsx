@@ -2,12 +2,11 @@
 
 import { invoiceIdAtom, pathFileAtom } from "@/atom/facture.atom";
 import { makeInvoiceElements } from "@/utils/canvas.action";
-// Importer depuis le fichier serveur
+import { fetchInvoiceImage } from "@/utils/facture.action";
 import { useAtom } from "jotai";
 import { useEffect, useRef, useState, startTransition } from "react";
 import { useActionState } from "react";
 import CanvasDrawing from "./CanvasDrawing";
-import { fetchInvoiceImage } from "@/utils/facture.action";
 
 interface BoundingBox {
     Top: number;
@@ -31,7 +30,7 @@ type SubmitResult = {
 } | null;
 
 export default function DisplayFacture() {
-    const [invoiceId] = useAtom(invoiceIdAtom);
+    const [invoiceId] = useAtom(invoiceIdAtom); // Récupérer invoiceId depuis l'atome
     const [pathFile] = useAtom(pathFileAtom);
     const [imageUrl, setImageUrl] = useState<string | null>(null);
     const [imageLoading, setImageLoading] = useState(false);
@@ -70,14 +69,18 @@ export default function DisplayFacture() {
         return () => {
             isMounted = false;
             if (imageUrl) {
-                URL.revokeObjectURL(imageUrl); // Toujours valide si vous revenez à URL.createObjectURL côté client
+                URL.revokeObjectURL(imageUrl);
             }
         };
     }, [pathFile]);
 
+    // Utilisation de useActionState avec invoiceId inclus via closure
     const [submitState, submitAction, isPending] = useActionState<SubmitResult, BoundingBox[]>(
         async (_previousState: SubmitResult, validBoxes: BoundingBox[]) => {
-            return await makeInvoiceElements(validBoxes);
+            if (!invoiceId) {
+                return { success: false, error: "ID de facture manquant" };
+            }
+            return await makeInvoiceElements(invoiceId, validBoxes); // Passer invoiceId et validBoxes
         },
         null
     );
@@ -89,7 +92,7 @@ export default function DisplayFacture() {
             return;
         }
         startTransition(() => {
-            submitAction(validBoxes);
+            submitAction(validBoxes); // Passer uniquement validBoxes, invoiceId est capturé par closure
         });
     };
 

@@ -72,7 +72,7 @@ export default function Header(): React.ReactElement {
                                     }`}
                             >
                                 <Image
-                                    src="/sonic.svg"
+                                    src="/facturotron.svg"
                                     alt="Logo"
                                     width={24}
                                     height={24}

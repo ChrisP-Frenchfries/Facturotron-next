@@ -1,6 +1,6 @@
 "use client";
 
-import { pathFileAtom } from "@/atom/facture.atom";
+import { invoiceIdAtom, pathFileAtom } from "@/atom/facture.atom";
 import { uploadDocument } from "@/utils/facture.action";
 import { useAtom } from "jotai";
 import { useActionState, useEffect } from "react";
@@ -12,6 +12,7 @@ const getSessionUserId = () => "2"; // Exemple statique, à adapter
 export default function UploadForm() {
 
     const [pathFile, setPathFile] = useAtom(pathFileAtom);
+    const [invoiceId, setInvoiceId] = useAtom(invoiceIdAtom);
 
 
 
@@ -23,6 +24,12 @@ export default function UploadForm() {
             setPathFile(state.filePath); // Met à jour l'atome avec le filePath retourné
         }
     }, [state.filePath, setPathFile]);
+
+    useEffect(() => {
+        if (state.invoiceId) {
+            setInvoiceId(state.invoiceId); // Met à jour l'atome avec le filePath retourné
+        }
+    }, [state.invoiceId, setInvoiceId]);
 
     return (
         <div className="container mx-auto p-4">
