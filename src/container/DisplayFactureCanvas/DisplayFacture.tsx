@@ -7,15 +7,16 @@ import { useAtom } from "jotai";
 import { useEffect, useRef, useState, startTransition } from "react";
 import { useActionState } from "react";
 import CanvasDrawing from "./CanvasDrawing";
+import { formBoxsAtom } from "@/atom/canvas.atom";
 
-interface BoundingBox {
+export interface BoundingBox {
     Top: number;
     Left: number;
     Width: number;
     Height: number;
 }
 
-type FetchResult = {
+export type FetchResult = {
     success: true;
     data: string;
 } | {
@@ -23,11 +24,25 @@ type FetchResult = {
     error: string;
 };
 
-type SubmitResult = {
+export type SubmitResult = {
     success: boolean;
     message?: string;
+    elements?: InvoiceElement[];
     error?: string;
 } | null;
+
+
+// Définition du type InvoiceElement
+export interface InvoiceElement {
+    id: string;
+    nom: string;
+    boundingBox: BoundingBox;
+    blocks: any[]; // Vous pouvez définir un type plus précis si nécessaire
+    confidence: number;
+}
+
+// Mise à jour du type SubmitResult
+
 
 export default function DisplayFacture() {
     const [invoiceId] = useAtom(invoiceIdAtom); // Récupérer invoiceId depuis l'atome
@@ -37,7 +52,8 @@ export default function DisplayFacture() {
     const [imageError, setImageError] = useState<string | null>(null);
     const [boundingBoxes, setBoundingBoxes] = useState<BoundingBox[]>([]);
     const imageRef = useRef<HTMLImageElement>(null);
-
+    // Accès à l'atome pour le mettre à jour
+    const [formBoxs, setformBoxs] = useAtom(formBoxsAtom);
     useEffect(() => {
         if (!pathFile) {
             setImageUrl(null);
@@ -84,6 +100,15 @@ export default function DisplayFacture() {
         },
         null
     );
+
+    // Effet pour mettre à jour l'atome quand submitState change
+    useEffect(() => {
+        // Ne mettre à jour que si submitState existe et que l'action a réussi
+        if (submitState?.success && submitState.elements) {
+            setformBoxs(submitState.elements);
+        }
+    }, [submitState, setformBoxs]); // Dépendances de l'effet
+
 
     const handleSubmit = () => {
         const validBoxes = boundingBoxes.filter((box) => box.Width > 0 && box.Height > 0);
