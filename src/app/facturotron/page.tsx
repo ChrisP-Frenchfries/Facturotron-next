@@ -1,5 +1,6 @@
 "use client"
 import DisplayFacture from "@/container/DisplayFactureCanvas/DisplayFacture";
+import FormCanvasListDynamique from "@/container/FormCanvasDynamique/FormCanvasListDynamique";
 import UploadForm from "@/container/UploadDocument/UploadForm";
 import { button } from "framer-motion/client";
 import { useState } from "react";
@@ -18,9 +19,12 @@ export default function Home() {
 
                 </div>
 
-                <div>
+                <div className="flex flex-col">
                     <UploadForm />
-                    <DisplayFacture />
+                    <div className="flex flex-row">
+                        <DisplayFacture />
+                        <FormCanvasListDynamique />
+                    </div>
                 </div>
 
 
