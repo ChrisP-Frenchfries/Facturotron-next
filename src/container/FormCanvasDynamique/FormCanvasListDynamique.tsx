@@ -3,7 +3,6 @@
 import React from "react";
 import { useAtom } from "jotai";
 import FormCardInputDynamique from "@/container/FormCanvasDynamique/FormCardInputDynamique";
-
 import { InvoiceElement } from "@/utils/canvas.action";
 import { Button } from "@/components/ui/button";
 import { formBoxsAtom } from "@/atom/canvas.atom";
@@ -29,12 +28,14 @@ export default function FormCanvasListDynamique() {
         setFormBoxs((prev) => [...prev, newElement]);
     };
 
-
     const clearCardList = () => {
-
-        setFormBoxs([])
-
-    }
+        formBoxs.forEach((element) => {
+            localStorage.removeItem(`${element.id}-boundingBox`);
+            localStorage.removeItem(`${element.id}-value`);
+            localStorage.removeItem(`${element.id}-selectedLabelField`);
+        });
+        setFormBoxs([]);
+    };
 
     const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
@@ -56,7 +57,7 @@ export default function FormCanvasListDynamique() {
                     onClick={clearCardList}
                     className="mb-4 bg-blue-500 hover:bg-blue-600"
                 >
-                    clear all
+                    Clear all
                 </Button>
                 <div className="space-y-4">
                     {formBoxs.length === 0 ? (

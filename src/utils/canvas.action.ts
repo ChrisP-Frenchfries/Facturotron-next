@@ -29,6 +29,7 @@
 
 "use server";
 
+import { LabelField } from "@/container/FormCanvasDynamique/LabelFieldSelector";
 import { nanoid } from "nanoid";
 
 export interface BoundingBox {
@@ -65,8 +66,9 @@ export interface InvoiceElement {
     boundingBox: BoundingBox;
     blocks: Block[];
     confidence: number;
+    inputValue?: string; // Ajout
+    selectedLabelField?: LabelField | null; // Ajout
 }
-
 /**
  * Vérifie si un bloc est entièrement à l'intérieur d'une BoundingBox.
  */
