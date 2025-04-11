@@ -50,7 +50,7 @@ export default function DisplayFacture() {
     const [imageUrl, setImageUrl] = useState<string | null>(null);
     const [imageLoading, setImageLoading] = useState(false);
     const [imageError, setImageError] = useState<string | null>(null);
-    const [boundingBoxes, setBoundingBoxes] = useAtom(boundingBoxesAtom);
+    const [boundingBoxes, setBoundingBoxes] = useAtom(boundingBoxesAtom);// ici on a les boudingBoxs de base
 
     const imageRef = useRef<HTMLImageElement>(null);
     // Accès à l'atome pour le mettre à jour
@@ -107,6 +107,9 @@ export default function DisplayFacture() {
         // Ne mettre à jour que si submitState existe et que l'action a réussi
         if (submitState?.success && Array.isArray(submitState.elements)) {
             setformBoxs([...submitState.elements, ...formBoxs]);
+            setBoundingBoxes([]) // clear les boundingBox
+
+
         }
     }, [submitState, setformBoxs]); // Dépendances de l'effet
 
