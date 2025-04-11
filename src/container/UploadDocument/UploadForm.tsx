@@ -44,7 +44,7 @@ export default function UploadForm() {
                     <select
                         id="clientId"
                         name="clientId"
-                        className="border p-2 w-full"
+                        className="border p-2 w-1/4"
                         disabled={isPending}
                         required
                     >
@@ -63,7 +63,7 @@ export default function UploadForm() {
                         id="document"
                         name="document"
                         accept=".pdf,image/*"
-                        className="border p-2 w-full"
+                        className="border p-2 w-1/4"
                         disabled={isPending}
                         required
                     />

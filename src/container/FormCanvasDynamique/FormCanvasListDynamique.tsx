@@ -29,6 +29,13 @@ export default function FormCanvasListDynamique() {
         setFormBoxs((prev) => [...prev, newElement]);
     };
 
+
+    const clearCardList = () => {
+
+        setFormBoxs([])
+
+    }
+
     const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
         console.log("Données soumises:", formBoxs);
@@ -43,6 +50,13 @@ export default function FormCanvasListDynamique() {
                     className="mb-4 bg-blue-500 hover:bg-blue-600"
                 >
                     Ajouter un champ
+                </Button>
+                <Button
+                    type="button"
+                    onClick={clearCardList}
+                    className="mb-4 bg-blue-500 hover:bg-blue-600"
+                >
+                    clear all
                 </Button>
                 <div className="space-y-4">
                     {formBoxs.length === 0 ? (

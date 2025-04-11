@@ -7,7 +7,7 @@ import { useAtom } from "jotai";
 import { useEffect, useRef, useState, startTransition } from "react";
 import { useActionState } from "react";
 import CanvasDrawing from "./CanvasDrawing";
-import { formBoxsAtom } from "@/atom/canvas.atom";
+import { boundingBoxesAtom, formBoxsAtom } from "@/atom/canvas.atom";
 
 export interface BoundingBox {
     Top: number;
@@ -50,7 +50,8 @@ export default function DisplayFacture() {
     const [imageUrl, setImageUrl] = useState<string | null>(null);
     const [imageLoading, setImageLoading] = useState(false);
     const [imageError, setImageError] = useState<string | null>(null);
-    const [boundingBoxes, setBoundingBoxes] = useState<BoundingBox[]>([]);
+    const [boundingBoxes, setBoundingBoxes] = useAtom(boundingBoxesAtom);
+
     const imageRef = useRef<HTMLImageElement>(null);
     // Accès à l'atome pour le mettre à jour
     const [formBoxs, setformBoxs] = useAtom(formBoxsAtom);
