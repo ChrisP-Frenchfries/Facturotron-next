@@ -6,13 +6,15 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import React, { useMemo } from "react";
 import { atom, useAtom, useAtomValue } from "jotai";
+import { atomWithStorage } from "jotai/utils"; // Importer atomWithStorage
 import { cn } from "@/lib/utils";
 import { BoundingBox, InvoiceElement } from "@/utils/canvas.action";
 import { formBoxsAtom } from "@/atom/canvas.atom";
 import LabelFieldSelector, { LabelField } from "./LabelFieldSelector";
 
-// Factory pour créer des atoms dynamiques avec typage générique
-const createDynamicAtom = <T,>(id: string, initialValue: T) => atom<T>(initialValue);
+// Factory pour créer des atoms dynamiques avec persistance
+const createDynamicAtom = <T,>(id: string, initialValue: T) =>
+    atomWithStorage<T>(id, initialValue);
 
 export default function FormCardInputDynamique({
     id,
@@ -81,9 +83,7 @@ export default function FormCardInputDynamique({
                         BoundingBox: Top: {currentBoundingBox.Top}, Left: {currentBoundingBox.Left}
                     </p>
                     <p>ID: {id}</p>
-                    {selectedLabelField && (
-                        <p>Champ sélectionné: {selectedLabelField.label}</p>
-                    )}
+                    {selectedLabelField && <p>Champ sélectionné: {selectedLabelField.label}</p>}
                 </div>
             </div>
         </Card>

@@ -1,7 +1,7 @@
 // components/LabelFieldSelector.tsx
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useAtom } from "jotai";
 import { PrimitiveAtom } from "jotai";
 import labelFields from "../../data/labelFields.json";
@@ -39,7 +39,12 @@ interface LabelFieldSelectorProps {
 export default function LabelFieldSelector({ atom }: LabelFieldSelectorProps) {
     const [selectedField, setSelectedField] = useAtom(atom);
     const [open, setOpen] = useState(false);
-    const [value, setValue] = useState("");
+    const [value, setValue] = useState(selectedField?.label || "");
+
+    // Synchroniser value avec selectedField au montage et à chaque changement
+    useEffect(() => {
+        setValue(selectedField?.label || "");
+    }, [selectedField]);
 
     const handleSelect = (currentValue: string) => {
         const selectedLabel = currentValue === value ? "" : currentValue;
