@@ -57,10 +57,10 @@ export default function FormCardInputDynamique({
     };
 
     return (
-        <Card className={cn("p-4 w-full max-w-md")}>
+        <Card className={cn(`p-4 w-full max-w-md ${selectedLabelField?.couleurDefaut} `)}>
             <div className="space-y-4">
                 {/* Sélecteur pour le type de champ */}
-                <div className="flex flex-col gap-2">
+                <div className="flex flex-col gap-2 ">
                     <Label htmlFor={`label-type-${id}`}>Type de champ</Label>
                     <LabelFieldSelector atom={selectedLabelFieldAtom} />
                 </div>
@@ -73,7 +73,7 @@ export default function FormCardInputDynamique({
                         value={inputValue}
                         onChange={handleInputChange}
                         placeholder="Entrez ou modifiez la valeur"
-                        className="w-full"
+                        className="w-full font-medium bg-white"
                     />
                 </div>
 
