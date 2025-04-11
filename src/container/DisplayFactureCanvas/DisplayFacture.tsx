@@ -105,8 +105,8 @@ export default function DisplayFacture() {
     // Effet pour mettre à jour l'atome quand submitState change
     useEffect(() => {
         // Ne mettre à jour que si submitState existe et que l'action a réussi
-        if (submitState?.success && submitState.elements) {
-            setformBoxs(submitState.elements);
+        if (submitState?.success && Array.isArray(submitState.elements)) {
+            setformBoxs([...submitState.elements, ...formBoxs]);
         }
     }, [submitState, setformBoxs]); // Dépendances de l'effet
 
