@@ -10,6 +10,7 @@ import { cn } from "@/lib/utils";
 import { BoundingBox, InvoiceElement } from "@/utils/canvas.action";
 import { formBoxsAtom } from "@/atom/canvas.atom";
 import LabelFieldSelector, { LabelField } from "./LabelFieldSelector";
+import { useAtomMap } from "./FormAtomProvider"; // Importer useAtomMap
 
 const createDynamicAtom = <T,>(id: string, initialValue: T) =>
   atomWithStorage<T>(id, initialValue);
@@ -24,22 +25,49 @@ export default function FormCardInputDynamique({
   const currentElement = formBoxs.find((element) => element.id === id);
   const initialTextValue = blocks?.[0]?.Text || "";
 
-  const boundingBoxAtom = useMemo(
-    () => createDynamicAtom<BoundingBox>(`${id}-boundingBox`, boundingBox),
-    [id, boundingBox]
-  );
-  const inputValueAtom = useMemo(
-    () => createDynamicAtom<string>(`${id}-value`, initialTextValue),
-    [id, initialTextValue]
-  );
-  const selectedLabelFieldAtom = useMemo(
-    () => createDynamicAtom<LabelField | null>(`${id}-selectedLabelField`, null),
-    [id]
-  );
+  // Accéder à la Map du contexte
+  const atomMap = useAtomMap();
+
+  // Créer les atomes dynamiques et les enregistrer dans le contexte
+  const boundingBoxAtom = useMemo(() => {
+    const atom = createDynamicAtom<BoundingBox>(`${id}-boundingBox`, boundingBox);
+    atomMap.set(`${id}-boundingBox`, atom); // Enregistrer dans la Map
+    return atom;
+  }, [id, boundingBox, atomMap]);
+
+  const inputValueAtom = useMemo(() => {
+    const atom = createDynamicAtom<string>(`${id}-inputValue`, initialTextValue);
+    atomMap.set(`${id}-inputValue`, atom); // Enregistrer dans la Map
+    return atom;
+  }, [id, initialTextValue, atomMap]);
+
+  const selectedLabelFieldAtom = useMemo(() => {
+    const atom = createDynamicAtom<LabelField | null>(
+      `${id}-selectedLabelField`,
+      null
+    );
+    atomMap.set(`${id}-selectedLabelField`, atom); // Enregistrer dans la Map
+    return atom;
+  }, [id, atomMap]);
+
+  // Nettoyage des atomes lors du démontage
+  useEffect(() => {
+    return () => {
+      atomMap.delete(`${id}-boundingBox`);
+      atomMap.delete(`${id}-inputValue`);
+      atomMap.delete(`${id}-selectedLabelField`);
+    };
+  }, [id, atomMap]);
 
   const [currentBoundingBox] = useAtom(boundingBoxAtom);
   const [inputValue, setInputValue] = useAtom(inputValueAtom);
-  const [selectedLabelField, setSelectedLabelField] = useAtom(selectedLabelFieldAtom);
+  const [selectedLabelField, setSelectedLabelField] = useAtom(
+    selectedLabelFieldAtom
+  );
+
+  console.log("currentBoundingBox:", currentBoundingBox);
+  console.log("inputValue:", inputValue);
+  console.log("selectedLabelField:", selectedLabelField);
 
   // Synchroniser avec formBoxsAtom
   useEffect(() => {
@@ -57,7 +85,11 @@ export default function FormCardInputDynamique({
   };
 
   return (
-    <Card className={cn(`p-4 w-full max-w-md ${selectedLabelField?.couleurDefaut}`)}>
+    <Card
+      className={cn(
+        `p-4 w-full max-w-md ${selectedLabelField?.couleurDefaut}`
+      )}
+    >
       <div className="space-y-4">
         <div className="flex flex-col gap-2">
           <Label htmlFor={`label-type-${id}`}>Type de champ</Label>
@@ -75,10 +107,13 @@ export default function FormCardInputDynamique({
         </div>
         <div className="text-sm text-muted-foreground">
           <p>
-            BoundingBox: Top: {currentBoundingBox.Top}, Left: {currentBoundingBox.Left}
+            BoundingBox: Top: {currentBoundingBox.Top}, Left:{" "}
+            {currentBoundingBox.Left}
           </p>
           <p>ID: {id}</p>
-          {selectedLabelField && <p>Champ sélectionné: {selectedLabelField.label}</p>}
+          {selectedLabelField && (
+            <p>Champ sélectionné: {selectedLabelField.label}</p>
+          )}
         </div>
       </div>
     </Card>
