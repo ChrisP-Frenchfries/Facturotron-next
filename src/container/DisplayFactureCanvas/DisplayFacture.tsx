@@ -9,6 +9,7 @@ import { useActionState } from "react";
 import CanvasDrawing from "./CanvasDrawing";
 import { activeCanvasDrawingAtom, boundingBoxesAtom, formBoxsAtom } from "@/atom/canvas.atom";
 import BoundingBoxEditor from "./BoundingBoxEditor";
+import BoundingBoxOverlay from "./BoundingBoxOverlay";
 
 
 
@@ -56,7 +57,7 @@ export default function DisplayFacture() {
     const [boundingBoxes, setBoundingBoxes] = useAtom(boundingBoxesAtom);// ici on a les boudingBoxs de base
     const [isActiveDrawing, setIsActiveDrawing] = useAtom(activeCanvasDrawingAtom);// ici on a les boudingBoxs de base
 
-    const imageRef = useRef<HTMLImageElement>(null);
+    const imageRef = useRef<HTMLImageElement | null>(null);
     // Accès à l'atome pour le mettre à jour
     const [formBoxs, setformBoxs] = useAtom(formBoxsAtom);
     useEffect(() => {
@@ -174,7 +175,7 @@ export default function DisplayFacture() {
 
 
 
-
+                        <BoundingBoxOverlay imageRef={imageRef} /> {/* Ajout ici */}
 
                         <BoundingBoxEditor imageRef={imageRef} /> {/* Ajoutez le nouveau composant */}
                     </div>

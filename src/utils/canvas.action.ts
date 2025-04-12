@@ -64,10 +64,10 @@ export interface InvoiceElement {
     id: string;
     nom: string;
     boundingBox: BoundingBox;
-    blocks: Block[];
+    blocks: any[];
     confidence: number;
-    inputValue?: string; // Ajout
-    selectedLabelField?: LabelField | null; // Ajout
+    inputValue?: string;
+    selectedLabelField?: LabelField | null; // Assurez-vous que ceci est inclus
 }
 /**
  * Vérifie si un bloc est entièrement à l'intérieur d'une BoundingBox.
