@@ -1,8 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import { useAtom } from "jotai";
-import { activeCanvasDrawingAtom } from "@/atom/canvas.atom"; // Ajustez le chemin selon votre structure
 
 interface BoundingBox {
     Top: number;
@@ -11,58 +9,39 @@ interface BoundingBox {
     Height: number;
 }
 
-interface CanvasDrawingProps {
+interface BoundingBoxEditorProps {
     imageRef: React.RefObject<HTMLImageElement | null>;
-    boundingBoxes: BoundingBox[];
-    setBoundingBoxes: (
-        boxes: BoundingBox[] | ((prev: BoundingBox[]) => BoundingBox[])
-    ) => void;
 }
 
-export default function CanvasDrawing({
-    imageRef,
-    boundingBoxes,
-    setBoundingBoxes,
-}: CanvasDrawingProps) {
+export default function BoundingBoxEditor({ imageRef }: BoundingBoxEditorProps) {
+    const [boxes, setBoxes] = useState<BoundingBox[]>([]);
     const [isDrawing, setIsDrawing] = useState(false);
     const [startPos, setStartPos] = useState<{ x: number; y: number } | null>(null);
     const [isDragging, setIsDragging] = useState<number | null>(null);
-    const [isResizing, setIsResizing] = useState<{
-        index: number;
-        handle: string;
-    } | null>(null);
+    const [isResizing, setIsResizing] = useState<{ index: number; handle: string } | null>(null);
     const [tempBox, setTempBox] = useState<BoundingBox | null>(null);
-    const [isActive] = useAtom(activeCanvasDrawingAtom); // Utiliser l'atome
 
     const MIN_SIZE = 0.001;
 
     const handleMouseDown = (e: React.MouseEvent<HTMLDivElement>) => {
-        if (!isActive) return; // Désactiver la création si isActive est false
-
         e.preventDefault();
-        console.log("Mouse down triggered on CanvasDrawing");
         if (!imageRef.current || isDragging !== null || isResizing !== null) return;
 
         const rect = imageRef.current.getBoundingClientRect();
         const x = e.clientX - rect.left;
         const y = e.clientY - rect.top;
-        console.log("Starting drawing at:", { x, y });
 
         setIsDrawing(true);
         setStartPos({ x, y });
     };
 
-    const handleCanvasMouseDown = (
+    const handleBoxMouseDown = (
         e: React.MouseEvent<HTMLDivElement>,
         index: number,
         handle?: "top-left" | "top-right" | "bottom-left" | "bottom-right"
     ) => {
-        if (!isActive) return; // Désactiver la gestion si isActive est false
-
         e.preventDefault();
         e.stopPropagation();
-        console.log("Canvas mouse down:", { index, handle });
-
         if (!imageRef.current) return;
 
         const rect = imageRef.current.getBoundingClientRect();
@@ -98,14 +77,12 @@ export default function CanvasDrawing({
                 Width: Math.max(MIN_SIZE, width / imageWidth),
                 Height: Math.max(MIN_SIZE, height / imageHeight),
             };
-            console.log("Drawing temp box:", newBox);
-
             setTempBox(newBox);
         } else if (isDragging !== null && startPos) {
             const dx = (currentX - startPos.x) / imageWidth;
             const dy = (currentY - startPos.y) / imageHeight;
 
-            setBoundingBoxes((prev) => {
+            setBoxes((prev) => {
                 const updated = [...prev];
                 const box = updated[isDragging];
                 updated[isDragging] = {
@@ -121,37 +98,25 @@ export default function CanvasDrawing({
             const dx = (currentX - startPos.x) / imageWidth;
             const dy = (currentY - startPos.y) / imageHeight;
 
-            setBoundingBoxes((prev) => {
+            setBoxes((prev) => {
                 const updated = [...prev];
                 const box = { ...updated[index] };
 
                 switch (handle) {
                     case "top-left":
                         box.Left = Math.max(0, box.Left + dx);
-                        box.Width = Math.min(
-                            box.Width + (box.Left - Math.max(0, box.Left + dx)),
-                            1 - box.Left
-                        );
+                        box.Width = Math.min(box.Width + (box.Left - Math.max(0, box.Left + dx)), 1 - box.Left);
                         box.Top = Math.max(0, box.Top + dy);
-                        box.Height = Math.min(
-                            box.Height + (box.Top - Math.max(0, box.Top + dy)),
-                            1 - box.Top
-                        );
+                        box.Height = Math.min(box.Height + (box.Top - Math.max(0, box.Top + dy)), 1 - box.Top);
                         break;
                     case "top-right":
                         box.Width = Math.min(1 - box.Left, box.Width + dx);
                         box.Top = Math.max(0, box.Top + dy);
-                        box.Height = Math.min(
-                            box.Height + (box.Top - Math.max(0, box.Top + dy)),
-                            1 - box.Top
-                        );
+                        box.Height = Math.min(box.Height + (box.Top - Math.max(0, box.Top + dy)), 1 - box.Top);
                         break;
                     case "bottom-left":
                         box.Left = Math.max(0, box.Left + dx);
-                        box.Width = Math.min(
-                            box.Width + (box.Left - Math.max(0, box.Left + dx)),
-                            1 - box.Left
-                        );
+                        box.Width = Math.min(box.Width + (box.Left - Math.max(0, box.Left + dx)), 1 - box.Left);
                         box.Height = Math.min(1 - box.Top, box.Height + dy);
                         break;
                     case "bottom-right":
@@ -170,12 +135,11 @@ export default function CanvasDrawing({
 
     const handleMouseUp = (e: React.MouseEvent<HTMLDivElement>) => {
         e.preventDefault();
-        console.log("Mouse up triggered");
         if (isDrawing && tempBox) {
             setIsDrawing(false);
             setStartPos(null);
             if (tempBox.Width >= MIN_SIZE && tempBox.Height >= MIN_SIZE) {
-                setBoundingBoxes((prev) => [...prev, tempBox]);
+                setBoxes((prev) => [...prev, tempBox]);
             }
             setTempBox(null);
         }
@@ -184,8 +148,7 @@ export default function CanvasDrawing({
     };
 
     const handleDeleteBox = (index: number) => {
-        if (!isActive) return; // Désactiver la suppression si isActive est false
-        setBoundingBoxes((prev) => prev.filter((_, i) => i !== index));
+        setBoxes((prev) => prev.filter((_, i) => i !== index));
     };
 
     return (
@@ -196,13 +159,13 @@ export default function CanvasDrawing({
                 left: 0,
                 width: "100%",
                 height: "100%",
-                zIndex: isActive ? 50 : 10, // z-index 50 si actif, 10 sinon
+                zIndex: 20,
             }}
             onMouseDown={handleMouseDown}
             onMouseMove={handleMouseMove}
             onMouseUp={handleMouseUp}
         >
-            {boundingBoxes.map((box, index) => (
+            {boxes.map((box, index) => (
                 <div
                     key={index}
                     style={{
@@ -211,10 +174,10 @@ export default function CanvasDrawing({
                         left: `${box.Left * 100}%`,
                         width: `${box.Width * 100}%`,
                         height: `${box.Height * 100}%`,
-                        border: "2px solid red",
-                        cursor: isActive ? "move" : "default", // Curseur inactif si non actif
+                        border: "2px solid green",
+                        cursor: "move",
                     }}
-                    onMouseDown={(e) => handleCanvasMouseDown(e, index)}
+                    onMouseDown={(e) => handleBoxMouseDown(e, index)}
                 >
                     <div
                         style={{
@@ -223,11 +186,10 @@ export default function CanvasDrawing({
                             left: "-5px",
                             width: "10px",
                             height: "10px",
-                            background: "blue",
-                            cursor: isActive ? "nwse-resize" : "default",
-                            display: isActive ? "block" : "none", // Cacher les poignées si inactif
+                            background: "yellow",
+                            cursor: "nwse-resize",
                         }}
-                        onMouseDown={(e) => handleCanvasMouseDown(e, index, "top-left")}
+                        onMouseDown={(e) => handleBoxMouseDown(e, index, "top-left")}
                     />
                     <div
                         style={{
@@ -236,11 +198,10 @@ export default function CanvasDrawing({
                             right: "-5px",
                             width: "10px",
                             height: "10px",
-                            background: "blue",
-                            cursor: isActive ? "nesw-resize" : "default",
-                            display: isActive ? "block" : "none",
+                            background: "yellow",
+                            cursor: "nesw-resize",
                         }}
-                        onMouseDown={(e) => handleCanvasMouseDown(e, index, "top-right")}
+                        onMouseDown={(e) => handleBoxMouseDown(e, index, "top-right")}
                     />
                     <div
                         style={{
@@ -249,11 +210,10 @@ export default function CanvasDrawing({
                             left: "-5px",
                             width: "10px",
                             height: "10px",
-                            background: "blue",
-                            cursor: isActive ? "nesw-resize" : "default",
-                            display: isActive ? "block" : "none",
+                            background: "yellow",
+                            cursor: "nesw-resize",
                         }}
-                        onMouseDown={(e) => handleCanvasMouseDown(e, index, "bottom-left")}
+                        onMouseDown={(e) => handleBoxMouseDown(e, index, "bottom-left")}
                     />
                     <div
                         style={{
@@ -262,11 +222,10 @@ export default function CanvasDrawing({
                             right: "-5px",
                             width: "10px",
                             height: "10px",
-                            background: "blue",
-                            cursor: isActive ? "nwse-resize" : "default",
-                            display: isActive ? "block" : "none",
+                            background: "yellow",
+                            cursor: "nwse-resize",
                         }}
-                        onMouseDown={(e) => handleCanvasMouseDown(e, index, "bottom-right")}
+                        onMouseDown={(e) => handleBoxMouseDown(e, index, "bottom-right")}
                     />
                     <div
                         style={{
@@ -279,10 +238,9 @@ export default function CanvasDrawing({
                             color: "white",
                             textAlign: "center",
                             lineHeight: "10px",
-                            cursor: isActive ? "pointer" : "default",
+                            cursor: "pointer",
                             fontSize: "10px",
-                            zIndex: 20,
-                            display: isActive ? "block" : "none", // Cacher le bouton de suppression si inactif
+                            zIndex: 10,
                         }}
                         onClick={(e) => {
                             e.stopPropagation();
@@ -293,7 +251,7 @@ export default function CanvasDrawing({
                     </div>
                 </div>
             ))}
-            {tempBox && isActive && (
+            {tempBox && (
                 <div
                     style={{
                         position: "absolute",
@@ -301,7 +259,7 @@ export default function CanvasDrawing({
                         left: `${tempBox.Left * 100}%`,
                         width: `${tempBox.Width * 100}%`,
                         height: `${tempBox.Height * 100}%`,
-                        border: "2px dashed red",
+                        border: "2px dashed green",
                         pointerEvents: "none",
                     }}
                 />

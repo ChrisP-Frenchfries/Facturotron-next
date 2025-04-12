@@ -15,3 +15,4 @@ export interface BoundingBox {
 
 // Atome pour boundingBoxes
 export const boundingBoxesAtom = atom<BoundingBox[]>([]);
+export const activeCanvasDrawingAtom = atom<boolean>(true);

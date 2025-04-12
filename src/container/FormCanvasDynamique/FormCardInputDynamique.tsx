@@ -50,7 +50,9 @@ export default function FormCardInputDynamique({
     return atom;
   }, [id, atomMap]);
 
-  // Nettoyage des atomes lors du démontage
+  // Nettoyage des atomes lors du démontage 
+  //atomMap.delete supprime chaque atome de la Map pour éviter les fuites de mémoire 
+  // et garantir que les atomes obsolètes ne restent pas dans le contexte.
   useEffect(() => {
     return () => {
       atomMap.delete(`${id}-boundingBox`);

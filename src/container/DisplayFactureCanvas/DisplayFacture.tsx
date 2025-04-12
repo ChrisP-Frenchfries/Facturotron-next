@@ -7,7 +7,8 @@ import { useAtom } from "jotai";
 import { useEffect, useRef, useState, startTransition } from "react";
 import { useActionState } from "react";
 import CanvasDrawing from "./CanvasDrawing";
-import { boundingBoxesAtom, formBoxsAtom } from "@/atom/canvas.atom";
+import { activeCanvasDrawingAtom, boundingBoxesAtom, formBoxsAtom } from "@/atom/canvas.atom";
+import BoundingBoxEditor from "./BoundingBoxEditor";
 
 export interface BoundingBox {
     Top: number;
@@ -51,6 +52,7 @@ export default function DisplayFacture() {
     const [imageLoading, setImageLoading] = useState(false);
     const [imageError, setImageError] = useState<string | null>(null);
     const [boundingBoxes, setBoundingBoxes] = useAtom(boundingBoxesAtom);// ici on a les boudingBoxs de base
+    const [isActiveDrawing, setIsActiveDrawing] = useAtom(activeCanvasDrawingAtom);// ici on a les boudingBoxs de base
 
     const imageRef = useRef<HTMLImageElement>(null);
     // Accès à l'atome pour le mettre à jour
@@ -113,7 +115,9 @@ export default function DisplayFacture() {
         }
     }, [submitState, setformBoxs]); // Dépendances de l'effet
 
-
+    const handleNewDrawing = () => {
+        setIsActiveDrawing(!isActiveDrawing)
+    }
     const handleSubmit = () => {
         const validBoxes = boundingBoxes.filter((box) => box.Width > 0 && box.Height > 0);
         if (validBoxes.length === 0) {
@@ -126,39 +130,52 @@ export default function DisplayFacture() {
     };
 
     return (
-        <div className="facture-display" style={{ userSelect: "none" }}>
-            {imageLoading && <p>Chargement de l'image...</p>}
-            {imageError && <p className="error">Erreur : {imageError}</p>}
-            {imageUrl && !imageLoading && (
-                <div style={{ position: "relative", display: "inline-block" }}>
-                    <img
-                        ref={imageRef}
-                        src={imageUrl}
-                        alt={`Facture ${invoiceId || ""}`}
-                        style={{ maxWidth: "100%", height: "auto" }}
-                        draggable={false}
-                        onError={() => {
-                            setImageError("Erreur lors du chargement de l'image");
-                            setImageUrl(null);
-                        }}
-                    />
-                    <CanvasDrawing
-                        imageRef={imageRef}
-                        boundingBoxes={boundingBoxes}
-                        setBoundingBoxes={setBoundingBoxes}
-                    />
-                </div>
-            )}
-            {!pathFile && !imageLoading && <p>Aucune facture sélectionnée</p>}
-            {submitState && !submitState.success && <p className="error">Erreur : {submitState.error}</p>}
-            {submitState && submitState.success && <p className="success">Succès : {submitState.message}</p>}
-            <button
-                onClick={handleSubmit}
-                className="mt-4 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
-                disabled={isPending}
-            >
-                {isPending ? "Soumission en cours..." : "Soumettre les boîtes"}
-            </button>
+        <div>
+            <div>
+                <button
+                    onClick={handleNewDrawing}
+                    className="mt-4 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+                >
+                    {isActiveDrawing ? "ne plus dessiner" : "desinner des chams"}
+                </button>
+                <button
+                    onClick={handleSubmit}
+                    className="mt-4 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+                    disabled={isPending}
+                >
+                    {isPending ? "Soumission en cours..." : "Soumettre les boîtes"}
+                </button>
+
+            </div>
+
+            <div className="facture-display" style={{ userSelect: "none" }}>
+                {imageLoading && <p>Chargement de l'image...</p>}
+                {imageError && <p className="error">Erreur : {imageError}</p>}
+                {imageUrl && !imageLoading && (
+                    <div style={{ position: "relative", display: "inline-block" }}>
+                        <img
+                            ref={imageRef}
+                            src={imageUrl}
+                            alt={`Facture ${invoiceId || ""}`}
+                            style={{ maxWidth: "100%", height: "auto" }}
+                            draggable={false}
+                            onError={() => {
+                                setImageError("Erreur lors du chargement de l'image");
+                                setImageUrl(null);
+                            }}
+                        />
+                        <CanvasDrawing
+                            imageRef={imageRef}
+                            boundingBoxes={boundingBoxes}
+                            setBoundingBoxes={setBoundingBoxes}
+                        />
+                        <BoundingBoxEditor imageRef={imageRef} /> {/* Ajoutez le nouveau composant */}
+                    </div>
+                )}
+                {!pathFile && !imageLoading && <p>Aucune facture sélectionnée</p>}
+                {submitState && !submitState.success && <p className="error">Erreur : {submitState.error}</p>}
+                {submitState && submitState.success && <p className="success">Succès : {submitState.message}</p>}
+            </div>
         </div>
     );
 }
