@@ -1,6 +1,6 @@
 "use client"
 import DisplayFacture from "@/container/DisplayFactureCanvas/DisplayFacture";
-import FormAtomProvider from "@/container/FormCanvasDynamique/FormAtomProvider";
+
 import FormCanvasListDynamique from "@/container/FormCanvasDynamique/FormCanvasListDynamique";
 import UploadForm from "@/container/UploadDocument/UploadForm";
 import { button } from "framer-motion/client";
@@ -11,7 +11,7 @@ export default function Home() {
 
 
     return (
-        <FormAtomProvider>
+        <>
             <h1> page de l'app</h1>
             <div>
                 <div>
@@ -31,7 +31,8 @@ export default function Home() {
 
             </div>
 
-        </FormAtomProvider>
+
+        </>
 
     );
 }

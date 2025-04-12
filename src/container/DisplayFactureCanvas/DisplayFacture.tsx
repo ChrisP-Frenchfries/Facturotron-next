@@ -10,6 +10,8 @@ import CanvasDrawing from "./CanvasDrawing";
 import { activeCanvasDrawingAtom, boundingBoxesAtom, formBoxsAtom } from "@/atom/canvas.atom";
 import BoundingBoxEditor from "./BoundingBoxEditor";
 
+
+
 export interface BoundingBox {
     Top: number;
     Left: number;
@@ -169,6 +171,11 @@ export default function DisplayFacture() {
                             boundingBoxes={boundingBoxes}
                             setBoundingBoxes={setBoundingBoxes}
                         />
+
+
+
+
+
                         <BoundingBoxEditor imageRef={imageRef} /> {/* Ajoutez le nouveau composant */}
                     </div>
                 )}

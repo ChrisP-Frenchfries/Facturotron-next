@@ -7,6 +7,7 @@ import { InvoiceElement } from "@/utils/canvas.action";
 import { Button } from "@/components/ui/button";
 import { formBoxsAtom } from "@/atom/canvas.atom";
 
+
 export default function FormCanvasListDynamique() {
     const [formBoxs, setFormBoxs] = useAtom(formBoxsAtom);
 
@@ -60,6 +61,7 @@ export default function FormCanvasListDynamique() {
                     Clear all
                 </Button>
                 <div className="space-y-4">
+
                     {formBoxs.length === 0 ? (
                         <p className="text-muted-foreground">
                             Aucun champ pour l'instant. Ajoutez-en un pour commencer.
@@ -67,8 +69,10 @@ export default function FormCanvasListDynamique() {
                     ) : (
                         formBoxs.map((element) => (
                             <FormCardInputDynamique key={element.id} {...element} />
+
                         ))
                     )}
+
                 </div>
                 {formBoxs.length > 0 && (
                     <Button type="submit" className="w-full bg-green-500 hover:bg-green-600">
