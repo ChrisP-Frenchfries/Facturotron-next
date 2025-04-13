@@ -2,25 +2,27 @@ import { InvoiceElement } from "@/utils/canvas.action";
 
 interface HoverBBoxProps {
     element: InvoiceElement;
+    isHovered: boolean;
 }
 
-export default function HoverBBox({ element }: HoverBBoxProps) {
+export default function HoverBBox({ element, isHovered }: HoverBBoxProps) {
     const { id, boundingBox, inputValue, selectedLabelField } = element;
-    selectedLabelField?.label
+
+    console.log(`HoverBBox for id=${id}, isHovered=${isHovered}`); // Debug log
 
     return (
         <div
-            key={id}
-            className={`absolute bg-white/30 shadow-lg rounded-lg p-2 text-sm backdrop-blur-sm text-center ${isActive ? 'block' : 'hidden'
-                }`} // Card semi-transparente, police réduite, visibilité contrôlée
+            key={`hover-${id}`}
+            className={`absolute bg-white/50 shadow-lg rounded-lg p-2 text-sm backdrop-blur-sm text-center ${isHovered ? "block" : "hidden"
+                } z-40`} // Increased z-index, more opacity for visibility
             style={{
-                top: labelTop,
+                top: `${boundingBox.Top * 100}%`,
                 left: `${boundingBox.Left * 100}%`,
                 width: `${boundingBox.Width * 100}%`,
             }}
         >
-            <p>{selectedLabelField?.label}</p>
-            <p>{inputValue}</p>
+            <p>{selectedLabelField?.label || "No Label"}</p>
+            <p>{inputValue || "No Value"}</p>
         </div>
     );
 }
