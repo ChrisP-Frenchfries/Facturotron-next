@@ -1,7 +1,7 @@
 "use client"; // Nécessaire pour CanvasDrawing et useActionState
 
 import { invoiceIdAtom, pathFileAtom } from "@/atom/facture.atom";
-import { makeInvoiceElements } from "@/utils/canvas.action";
+import { InvoiceElement, makeInvoiceElements } from "@/utils/canvas.action";
 import { fetchInvoiceImage } from "@/utils/facture.action";
 import { useAtom } from "jotai";
 import { useEffect, useRef, useState, startTransition } from "react";
@@ -9,7 +9,7 @@ import { useActionState } from "react";
 import CanvasDrawing from "./CanvasDrawing";
 import { activeCanvasDrawingAtom, boundingBoxesAtom, formBoxsAtom } from "@/atom/canvas.atom";
 import BoundingBoxEditor from "./BoundingBoxEditor";
-import BoundingBoxOverlay from "./BoundingBoxOverlay";
+import BoundingBoxOverlay from "./BoundingBoxOverLay/BoundingBoxOverlay";
 
 
 
@@ -36,14 +36,7 @@ export type SubmitResult = {
 } | null;
 
 
-// Définition du type InvoiceElement
-export interface InvoiceElement {
-    id: string;
-    nom: string;
-    boundingBox: BoundingBox;
-    blocks: any[]; // Vous pouvez définir un type plus précis si nécessaire
-    confidence: number;
-}
+
 
 // Mise à jour du type SubmitResult
 
