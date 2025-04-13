@@ -96,14 +96,14 @@ export default function LabelFieldSelector({ atom }: LabelFieldSelectorProps) {
             </Popover>
 
             {/* Affichage de l'objet sélectionné pour démo */}
-            {selectedField && (
+            {/* {selectedField && (
                 <div className="mt-4 p-4 bg-gray-50 rounded-md">
                     <h3 className="text-sm font-medium text-gray-900">Champ sélectionné :</h3>
                     <pre className="mt-2 text-sm text-gray-600">
                         {JSON.stringify(selectedField, null, 2)}
                     </pre>
                 </div>
-            )}
+            )} */}
         </div>
     );
 }

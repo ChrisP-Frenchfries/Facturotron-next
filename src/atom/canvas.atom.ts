@@ -18,4 +18,4 @@ export const boundingBoxesAtom = atom<BoundingBox[]>([]);
 
 //Atome panel
 export const activeCanvasDrawingAtom = atom<boolean>(true);
-export const activeInputValue = atom<boolean>(true);
+export const activeInputValueAtom = atom<boolean>(true);

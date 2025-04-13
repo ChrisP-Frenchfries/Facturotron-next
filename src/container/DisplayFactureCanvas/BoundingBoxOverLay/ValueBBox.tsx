@@ -1,6 +1,6 @@
 import { useAtom } from 'jotai';
 import { InvoiceElement } from '@/utils/canvas.action';
-import { activeInputValue } from '@/atom/canvas.atom';
+import { activeInputValueAtom } from '@/atom/canvas.atom';
 
 
 interface ValueBBoxProps {
@@ -9,7 +9,7 @@ interface ValueBBoxProps {
 
 export default function ValueBBox({ element }: ValueBBoxProps) {
     const { id, boundingBox, inputValue } = element;
-    const [isActive] = useAtom(activeInputValue);
+    const [isActive] = useAtom(activeInputValueAtom);
 
     // Calcul de la position du label en dessous de la box
     const labelTop = `${(boundingBox.Top + boundingBox.Height) * 100}%`;

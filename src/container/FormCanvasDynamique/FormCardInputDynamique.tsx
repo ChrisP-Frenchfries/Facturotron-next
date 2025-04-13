@@ -72,13 +72,13 @@ export default function FormCardInputDynamique({
         `p-4 w-full max-w-md ${selectedLabelField?.couleurDefaut}`
       )}
     >
-      <div className="space-y-4">
+      <div className="space-y-1">
         <div className="flex flex-col gap-2">
-          <Label htmlFor={`label-type-${id}`}>Type de champ</Label>
+          {/* <Label htmlFor={`label-type-${id}`}>Type de champ</Label> */}
           <LabelFieldSelector atom={selectedLabelFieldAtom} />
         </div>
         <div className="flex flex-col gap-2">
-          <Label htmlFor={`input-${id}`}>Valeur (extrait des blocks)</Label>
+          {/* <Label htmlFor={`input-${id}`}>Valeur (extrait des blocks)</Label> */}
           <Input
             id={`input-${id}`}
             value={inputValue}
@@ -87,7 +87,7 @@ export default function FormCardInputDynamique({
             className="w-full font-medium bg-white"
           />
         </div>
-        <div className="text-sm-foreground">
+        {/* <div className="text-sm-foreground">
           <p>
             BoundingBox: Top: {currentBoundingBox.Top}, Left:{" "}
             {currentBoundingBox.Left}
@@ -96,7 +96,7 @@ export default function FormCardInputDynamique({
           {selectedLabelField && (
             <p>Champ sélectionné: {selectedLabelField.label}</p>
           )}
-        </div>
+        </div> */}
       </div>
     </Card>
   );

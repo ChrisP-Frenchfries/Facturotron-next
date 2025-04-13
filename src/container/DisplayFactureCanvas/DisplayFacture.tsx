@@ -7,7 +7,7 @@ import { useAtom } from "jotai";
 import { useEffect, useRef, useState, startTransition } from "react";
 import { useActionState } from "react";
 import CanvasDrawing from "./CanvasDrawing";
-import { activeCanvasDrawingAtom, boundingBoxesAtom, formBoxsAtom } from "@/atom/canvas.atom";
+import { activeCanvasDrawingAtom, activeInputValueAtom, boundingBoxesAtom, formBoxsAtom } from "@/atom/canvas.atom";
 import BoundingBoxEditor from "./BoundingBoxEditor";
 import BoundingBoxOverlay from "./BoundingBoxOverLay/BoundingBoxOverlay";
 
@@ -48,7 +48,10 @@ export default function DisplayFacture() {
     const [imageLoading, setImageLoading] = useState(false);
     const [imageError, setImageError] = useState<string | null>(null);
     const [boundingBoxes, setBoundingBoxes] = useAtom(boundingBoxesAtom);// ici on a les boudingBoxs de base
+
+    // mes Atoms de panel
     const [isActiveDrawing, setIsActiveDrawing] = useAtom(activeCanvasDrawingAtom);// ici on a les boudingBoxs de base
+    const [showInputValue, setShowInputValue] = useAtom(activeInputValueAtom);// ici on a les valueInput
 
     const imageRef = useRef<HTMLImageElement | null>(null);
     // Accès à l'atome pour le mettre à jour
@@ -114,6 +117,13 @@ export default function DisplayFacture() {
     const handleNewDrawing = () => {
         setIsActiveDrawing(!isActiveDrawing)
     }
+
+
+    const handleShowInputValue = () => {
+        setShowInputValue(!showInputValue)
+    }
+
+
     const handleSubmit = () => {
         const validBoxes = boundingBoxes.filter((box) => box.Width > 0 && box.Height > 0);
         if (validBoxes.length === 0) {
@@ -140,6 +150,14 @@ export default function DisplayFacture() {
                     disabled={isPending}
                 >
                     {isPending ? "Soumission en cours..." : "Soumettre les boîtes"}
+                </button>
+
+
+                <button
+                    onClick={handleShowInputValue}
+                    className="mt-4 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+                >
+                    {showInputValue ? "cacher les valeurs" : "aficher les valeurs"}
                 </button>
 
             </div>
