@@ -35,7 +35,9 @@ export default function BoundingBoxOverlay({ imageRef }: BoundingBoxOverlayProps
 
 
                 return (
-                    <div>
+                    <div
+                        key={id}
+                    >
                         <BBox element={element} />
                         <ValueBBox element={element} />
                     </div>

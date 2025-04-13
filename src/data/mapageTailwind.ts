@@ -2,8 +2,47 @@ export type TailwindColor =
     string
 
 
+export const bgColorOpacity30Map: Record<TailwindColor, string> = {
+    "bg-red-500": "bg-red-500/30",
+    "bg-blue-500": "bg-blue-500/30",
+    "bg-blue-400": "bg-blue-400/30",
+    "bg-blue-300": "bg-blue-300/30",
+    "bg-blue-200": "bg-blue-200/30",
+    "bg-indigo-500": "bg-indigo-500/30",
+    "bg-indigo-400": "bg-indigo-400/30",
+    "bg-indigo-300": "bg-indigo-300/30",
+    "bg-green-500": "bg-green-500/30",
+    "bg-green-400": "bg-green-400/30",
+    "bg-green-300": "bg-green-300/30",
+    "bg-teal-500": "bg-teal-500/30",
+    "bg-teal-400": "bg-teal-400/30",
+    "bg-yellow-500": "bg-yellow-500/30",
+    "bg-yellow-400": "bg-yellow-400/30",
+    "bg-yellow-300": "bg-yellow-300/30",
+    "bg-lime-300": "bg-lime-300/30",
+    "bg-orange-300": "bg-orange-300/30",
+    "bg-green-200": "bg-green-200/30",
+    "bg-purple-500": "bg-purple-500/30",
+    "bg-purple-400": "bg-purple-400/30",
+    "bg-purple-300": "bg-purple-300/30",
+    "bg-gray-500": "bg-gray-500/30",
+    "bg-gray-400": "bg-gray-400/30",
+    "bg-cyan-500": "bg-cyan-500/30",
+    "bg-cyan-400": "bg-cyan-400/30",
+    "bg-cyan-300": "bg-cyan-300/30",
+    "bg-orange-500": "bg-orange-500/30",
+    "bg-orange-400": "bg-orange-400/30",
+    "bg-pink-500": "bg-pink-500/30",
+    "bg-pink-400": "bg-pink-400/30",
+    "bg-pink-300": "bg-pink-300/30",
+    "bg-lime-500": "bg-lime-500/30",
+    "bg-lime-400": "bg-lime-400/30"
+};
+
+
 
 export const borderColorMap: Record<TailwindColor, string> = {
+    "bg-red-500": "border-red-500",
     "bg-blue-500": "border-blue-500",
     "bg-blue-400": "border-blue-400",
     "bg-blue-300": "border-blue-300",
@@ -41,6 +80,7 @@ export const borderColorMap: Record<TailwindColor, string> = {
 
 
 export const classicColorMap: Record<TailwindColor, string> = {
+    "bg-red-500": "red-500",
     "bg-blue-500": "blue-500",
     "bg-blue-400": "blue-400",
     "bg-blue-300": "blue-300",
