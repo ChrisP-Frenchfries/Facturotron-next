@@ -92,19 +92,19 @@
     {
       "typeTextExtract": "TOTAL",
       "label": "Montant total TTC",
-      "couleurDefaut": "bg-red-500",
+      "couleurDefaut": "bg-lime-300",
       "description": "Montant total toutes taxes comprises."
     },
     {
       "typeTextExtract": null,
       "label": "Montant dû",
-      "couleurDefaut": "bg-red-400",
+      "couleurDefaut": "bg-orange-300",
       "description": "Montant restant à payer après déduction des paiements effectués."
     },
     {
       "typeTextExtract": null,
       "label": "Montant payé",
-      "couleurDefaut": "bg-red-300",
+      "couleurDefaut": "bg-green-200",
       "description": "Montant déjà payé par l’acheteur."
     },
     {
