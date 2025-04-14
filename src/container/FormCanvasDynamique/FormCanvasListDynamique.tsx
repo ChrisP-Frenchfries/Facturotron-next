@@ -1,15 +1,20 @@
 "use client";
 
-import React from "react";
+import React, { useActionState } from "react";
 import { useAtom } from "jotai";
 import FormCardInputDynamique from "@/container/FormCanvasDynamique/FormCardInputDynamique";
 import { InvoiceElement } from "@/utils/canvas.action";
 import { Button } from "@/components/ui/button";
 import { formBoxsAtom } from "@/atom/canvas.atom";
-
+import { formAddInvoiceElement } from "@/utils/facture.action";
+import { invoiceIdAtom } from "@/atom/facture.atom";
 
 export default function FormCanvasListDynamique() {
+
+
+    const [invoiceId, setInvoiceId] = useAtom(invoiceIdAtom);
     const [formBoxs, setFormBoxs] = useAtom(formBoxsAtom);
+    const [state, formAction, isPending] = useActionState(formAddInvoiceElement, { message: null });
 
     const addFormCard = () => {
         const newElement: InvoiceElement = {
@@ -38,14 +43,11 @@ export default function FormCanvasListDynamique() {
         setFormBoxs([]);
     };
 
-    const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-        e.preventDefault();
-        console.log("Données soumises:", formBoxs);
-    };
-
     return (
         <div className="p-4">
-            <form onSubmit={handleSubmit} className="space-y-6">
+            <form action={formAction} className="space-y-6">
+                <input type="hidden" name="invoiceId" value={invoiceId ? String(invoiceId) : ""} />
+                <input type="hidden" name="formBoxs" value={JSON.stringify(formBoxs)} />
                 <Button
                     type="button"
                     onClick={addFormCard}
@@ -61,7 +63,6 @@ export default function FormCanvasListDynamique() {
                     Clear all
                 </Button>
                 <div className="space-y-4">
-
                     {formBoxs.length === 0 ? (
                         <p className="text-muted-foreground">
                             Aucun champ pour l'instant. Ajoutez-en un pour commencer.
@@ -69,15 +70,20 @@ export default function FormCanvasListDynamique() {
                     ) : (
                         formBoxs.map((element) => (
                             <FormCardInputDynamique key={element.id} {...element} />
-
                         ))
                     )}
-
                 </div>
                 {formBoxs.length > 0 && (
-                    <Button type="submit" className="w-full bg-green-500 hover:bg-green-600">
-                        Soumettre le formulaire
+                    <Button
+                        type="submit"
+                        className="w-full bg-green-500 hover:bg-green-600"
+                        disabled={isPending}
+                    >
+                        {isPending ? "Soumission..." : "Soumettre le formulaire"}
                     </Button>
+                )}
+                {state?.message && (
+                    <p className="mt-2 text-sm text-red-500">{state.message}</p>
                 )}
             </form>
         </div>

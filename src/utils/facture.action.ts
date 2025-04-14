@@ -2,6 +2,7 @@
 
 import { ApiResponseAdd } from "@/types/types.response";
 import { revalidatePath } from "next/cache";
+import { InvoiceElement } from "./canvas.action";
 
 // Définir un type pour la réponse de la fonction
 interface UploadResponse {
@@ -102,5 +103,45 @@ export async function fetchInvoiceImage(filePath: string): Promise<{
             success: false,
             error: error.message || "Une erreur inconnue est survenue",
         };
+    }
+}
+
+
+
+
+
+
+export async function formAddInvoiceElement(
+    prevState: { message: string | null },
+    formData: FormData
+): Promise<{ message: string | null }> {
+    try {
+
+        console.log(formData)
+        const invoiceId = formData.get("invoiceId")?.toString();
+        const formBoxsRaw = formData.get("formBoxs")?.toString();
+
+        if (!invoiceId || !formBoxsRaw) {
+            return { message: "Missing required fields" };
+        }
+
+        const formBoxs: InvoiceElement[] = JSON.parse(formBoxsRaw);
+
+        const response = await fetch(`http://localhost:4242/api/facture/${invoiceId}/`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify(formBoxs),
+        });
+
+        if (!response.ok) {
+            throw new Error("Failed to submit invoice elements");
+        }
+
+        return { message: "Invoice elements submitted successfully" };
+    } catch (error) {
+        console.error("Error submitting invoice elements:", error);
+        return { message: "Error submitting invoice elements" };
     }
 }
