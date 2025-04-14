@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useActionState, useState } from "react";
+import React, { useActionState, useEffect, useState } from "react";
 import { useAtom } from "jotai";
 import FormCardInputDynamique from "@/container/FormCanvasDynamique/FormCardInputDynamique";
 import { InvoiceElement } from "@/utils/canvas.action";
@@ -29,7 +29,11 @@ export default function FormCanvasListDynamique() {
         data: [],
     });
 
-
+    useEffect(() => {
+        if (printState.success && printState.data.length > 0) {
+            setIsModalOpen(true);
+        }
+    }, [printState]);
 
     const [state, formAction, isPending] = useActionState(formAddInvoiceElement, { message: null });
 

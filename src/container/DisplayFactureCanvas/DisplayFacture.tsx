@@ -194,6 +194,8 @@ export default function DisplayFacture() {
                 {!pathFile && !imageLoading && <p>Aucune facture sélectionnée</p>}
                 {submitState && !submitState.success && <p className="error">Erreur : {submitState.error}</p>}
                 {submitState && submitState.success && <p className="success">Succès : {submitState.message}</p>}
+
+
             </div>
         </div>
     );
