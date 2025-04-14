@@ -11,6 +11,65 @@ interface UploadResponse {
     filePath?: string; // Propriété optionnelle si elle n'est pas toujours présente
 }
 
+
+
+
+// Interface pour la structure des données retournées par l'API
+interface ApiResponse {
+    success: boolean;
+    message: string;
+    data: Array<{
+        invoiceId: number;
+        [key: string]: string | number;
+    }>;
+    error?: string | null;
+}
+
+// Interface pour l'état géré par useActionState
+interface ActionState {
+    success: boolean;
+    message: string;
+    data: Array<{
+        invoiceId: number;
+        [key: string]: string | number;
+    }>;
+    error: string | null;
+}
+
+// Fonction pour effectuer la requête fetch (peut être réutilisée)
+async function fetchReadyForPrint(firmAccountingId: string | number, userId: string | number | null = null): Promise<ApiResponse> {
+    try {
+        let url = `http://localhost:4242/api/facture/ready/?firmAccountingId=${firmAccountingId}`;
+        if (userId) {
+            url += `&userId=${userId}`;
+        }
+
+        const response = await fetch(url, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+                // Ajoutez un token si nécessaire
+                // 'Authorization': `Bearer ${yourToken}`
+            },
+        });
+
+        if (!response.ok) {
+            throw new Error(`Erreur HTTP: ${response.status} - ${response.statusText}`);
+        }
+
+        return await response.json();
+    } catch (error: unknown) {
+        // Typage explicite de error comme unknown, puis conversion en Error
+        if (error instanceof Error) {
+            throw new Error(`Erreur lors de la récupération des factures: ${error.message}`);
+        }
+        throw new Error(`Erreur lors de la récupération des factures: ${String(error)}`);
+    }
+}
+
+
+
+
 // Server Action pour envoyer le fichier et les paramètres à l'API
 export async function uploadDocument(
     prevState: { message: string | null },
@@ -143,5 +202,55 @@ export async function formAddInvoiceElement(
     } catch (error) {
         console.error("Error submitting invoice elements:", error);
         return { message: "Error submitting invoice elements" };
+    }
+}
+
+
+
+
+// Action serveur pour React 19
+export async function getReadyForPrintAction(prevState: ActionState, formData: FormData): Promise<ActionState> {
+    // Récupérer les valeurs et les convertir en string ou number
+    const firmAccountingIdRaw = formData.get('firmAccountingId');
+    const userIdRaw = formData.get('userId');
+
+    // Convertir firmAccountingId en string ou number (on s'attend à un nombre)
+    const firmAccountingId = firmAccountingIdRaw ? String(firmAccountingIdRaw) : null;
+    // Convertir userId en string ou number, ou null si vide
+    const userId = userIdRaw ? String(userIdRaw) : null;
+
+    try {
+        if (!firmAccountingId) {
+            return {
+                success: false,
+                error: 'Le paramètre firmAccountingId est requis',
+                data: [],
+                message: '',
+            };
+        }
+
+        const result = await fetchReadyForPrint(firmAccountingId, userId);
+        return {
+            success: result.success,
+            message: result.message,
+            data: result.data,
+            error: null,
+        };
+    } catch (error: unknown) {
+        // Typage explicite de error comme unknown, puis conversion
+        if (error instanceof Error) {
+            return {
+                success: false,
+                error: error.message,
+                data: [],
+                message: '',
+            };
+        }
+        return {
+            success: false,
+            error: String(error),
+            data: [],
+            message: '',
+        };
     }
 }
