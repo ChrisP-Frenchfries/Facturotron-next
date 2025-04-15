@@ -18,13 +18,16 @@ export default function FormCardInputDynamique({
   id,
   blocks,
   boundingBox,
-  ...rest
+  inputValue: initialInputValue, // Récupérer inputValue des props
+  selectedLabelField: initialSelectedLabelField, // Récupérer selectedLabelField des props
 }: InvoiceElement) {
   const [formBoxs, setFormBoxs] = useAtom(formBoxsAtom);
   const currentElement = formBoxs.find((element) => element.id === id);
-  const initialTextValue = blocks?.[0]?.Text || "";
 
-  // Créer les atomes localement sans dépendre d'une Map partagée
+  // Utiliser inputValue des props comme valeur initiale, avec fallback sur blocks si nécessaire
+  const initialTextValue = initialInputValue ?? blocks?.[0]?.Text ?? "";
+
+  // Créer les atomes localement
   const boundingBoxAtom = useMemo(
     () => createDynamicAtom<BoundingBox>(`${id}-boundingBox`, boundingBox),
     [id, boundingBox]
@@ -37,8 +40,11 @@ export default function FormCardInputDynamique({
 
   const selectedLabelFieldAtom = useMemo(
     () =>
-      createDynamicAtom<LabelField | null>(`${id}-selectedLabelField`, null),
-    [id]
+      createDynamicAtom<LabelField | null>(
+        `${id}-selectedLabelField`,
+        initialSelectedLabelField ?? null
+      ),
+    [id, initialSelectedLabelField]
   );
 
   const [currentBoundingBox] = useAtom(boundingBoxAtom);
@@ -51,11 +57,13 @@ export default function FormCardInputDynamique({
   console.log("inputValue:", inputValue);
   console.log("selectedLabelField:", selectedLabelField);
 
-  // Synchroniser avec formBoxsAtom
+  // Synchroniser avec formBoxsAtom uniquement si les valeurs ont changé
   useEffect(() => {
     setFormBoxs((prev) =>
       prev.map((element) =>
-        element.id === id
+        element.id === id &&
+          (element.inputValue !== inputValue ||
+            element.selectedLabelField !== selectedLabelField)
           ? { ...element, inputValue, selectedLabelField }
           : element
       )
@@ -69,16 +77,14 @@ export default function FormCardInputDynamique({
   return (
     <Card
       className={cn(
-        `p-4 w-full max-w-md ${selectedLabelField?.couleurDefaut}`
+        `p-4 w-full max-w-md ${selectedLabelField?.couleurDefaut || ""}`
       )}
     >
       <div className="space-y-1">
         <div className="flex flex-col gap-2">
-          {/* <Label htmlFor={`label-type-${id}`}>Type de champ</Label> */}
           <LabelFieldSelector atom={selectedLabelFieldAtom} />
         </div>
         <div className="flex flex-col gap-2">
-          {/* <Label htmlFor={`input-${id}`}>Valeur (extrait des blocks)</Label> */}
           <Input
             id={`input-${id}`}
             value={inputValue}
@@ -87,16 +93,6 @@ export default function FormCardInputDynamique({
             className="w-full font-medium bg-white"
           />
         </div>
-        {/* <div className="text-sm-foreground">
-          <p>
-            BoundingBox: Top: {currentBoundingBox.Top}, Left:{" "}
-            {currentBoundingBox.Left}
-          </p>
-          <p>ID: {id}</p>
-          {selectedLabelField && (
-            <p>Champ sélectionné: {selectedLabelField.label}</p>
-          )}
-        </div> */}
       </div>
     </Card>
   );

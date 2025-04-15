@@ -1,200 +1,314 @@
 [
-    {
-      "typeTextExtract": "VENDOR_NAME",
-      "label": "Nom du fournisseur",
-      "couleurDefaut": "bg-blue-500",
-      "description": "Nom du vendeur ou fournisseur émettant la facture."
-    },
-    {
-      "typeTextExtract": null,
-      "label": "Adresse du fournisseur",
-      "couleurDefaut": "bg-blue-400",
-      "description": "Adresse complète du vendeur, incluant rue, ville, code postal et pays."
-    },
-    {
-      "typeTextExtract": null,
-      "label": "Téléphone du fournisseur",
-      "couleurDefaut": "bg-blue-300",
-      "description": "Numéro de téléphone du vendeur pour contact."
-    },
-    {
-      "typeTextExtract": null,
-      "label": "Site web du fournisseur",
-      "couleurDefaut": "bg-blue-200",
-      "description": "Site web du vendeur, si présent sur la facture."
-    },
-    {
-      "typeTextExtract": null,
-      "label": "Numéro SIRET",
-      "couleurDefaut": "bg-indigo-500",
-      "description": "Numéro SIRET ou SIREN du vendeur, obligatoire en France."
-    },
-    {
-      "typeTextExtract": "VENDOR_TAX_ID",
-      "label": "Numéro de TVA intracommunautaire (fournisseur)",
-      "couleurDefaut": "bg-indigo-400",
-      "description": "Numéro de TVA intracommunautaire du vendeur (par exemple, FRXX123456789)."
-    },
-    {
-      "typeTextExtract": "INVOICE_RECEIPT_ID",
-      "label": "Numéro de facture",
-      "couleurDefaut": "bg-green-500",
-      "description": "Numéro unique identifiant la facture ou le reçu."
-    },
-    {
-      "typeTextExtract": "INVOICE_RECEIPT_DATE",
-      "label": "Date de facture",
-      "couleurDefaut": "bg-green-400",
-      "description": "Date d’émission de la facture ou du reçu."
-    },
-    {
-      "typeTextExtract": "DUE_DATE",
-      "label": "Date d’échéance",
-      "couleurDefaut": "bg-green-300",
-      "description": "Date limite pour le paiement de la facture."
-    },
-    {
-      "typeTextExtract": null,
-      "label": "Date de commande",
-      "couleurDefaut": "bg-teal-500",
-      "description": "Date à laquelle la commande a été passée, si distincte de la date de facture."
-    },
-    {
-      "typeTextExtract": null,
-      "label": "Date de livraison",
-      "couleurDefaut": "bg-teal-400",
-      "description": "Date prévue ou effective de livraison des biens ou services."
-    },
-    {
-      "typeTextExtract": "SUBTOTAL",
-      "label": "Montant hors taxes (HT)",
-      "couleurDefaut": "bg-yellow-500",
-      "description": "Montant total hors taxes des biens ou services."
-    },
-    {
-      "typeTextExtract": "TAX",
-      "label": "Montant de la TVA",
-      "couleurDefaut": "bg-yellow-400",
-      "description": "Montant total des taxes appliquées (par exemple, TVA à 20 %)."
-    },
-    {
-      "typeTextExtract": null,
-      "label": "Taux de TVA",
-      "couleurDefaut": "bg-yellow-300",
-      "description": "Taux de TVA appliqué (par exemple, 20 %, 5,5 %, 2,1 %)."
-    },
-    {
-      "typeTextExtract": "TAX_PAYER_ID",
-      "label": "Numéro de TVA intracommunautaire (client)",
-      "couleurDefaut": "bg-indigo-300",
-      "description": "Numéro de TVA intracommunautaire de l’acheteur, si applicable."
-    },
-    {
-      "typeTextExtract": "TOTAL",
-      "label": "Montant total TTC",
-      "couleurDefaut": "bg-lime-300",
-      "description": "Montant total toutes taxes comprises."
-    },
-    {
-      "typeTextExtract": null,
-      "label": "Montant dû",
-      "couleurDefaut": "bg-orange-300",
-      "description": "Montant restant à payer après déduction des paiements effectués."
-    },
-    {
-      "typeTextExtract": null,
-      "label": "Montant payé",
-      "couleurDefaut": "bg-green-200",
-      "description": "Montant déjà payé par l’acheteur."
-    },
-    {
-      "typeTextExtract": null,
-      "label": "Remise",
-      "couleurDefaut": "bg-purple-500",
-      "description": "Réduction appliquée sur le montant total."
-    },
-    {
-      "typeTextExtract": null,
-      "label": "Numéro de compte client",
-      "couleurDefaut": "bg-purple-400",
-      "description": "Numéro de compte attribué au client par le fournisseur."
-    },
-    {
-      "typeTextExtract": "PAYMENT_TERMS",
-      "label": "Conditions de paiement",
-      "couleurDefaut": "bg-purple-300",
-      "description": "Conditions de paiement, par exemple 'Net 30' ou 'À réception'."
-    },
-    {
-      "typeTextExtract": null,
-      "label": "Devise",
-      "couleurDefaut": "bg-gray-500",
-      "description": "Devise utilisée pour la facture (par exemple, EUR, USD)."
-    },
-    {
-      "typeTextExtract": null,
-      "label": "Numéro de bon de commande",
-      "couleurDefaut": "bg-gray-400",
-      "description": "Numéro du bon de commande associé à la facture."
-    },
-    {
-      "typeTextExtract": null,
-      "label": "IBAN",
-      "couleurDefaut": "bg-cyan-500",
-      "description": "Numéro IBAN du compte bancaire du vendeur pour le paiement."
-    },
-    {
-      "typeTextExtract": null,
-      "label": "BIC",
-      "couleurDefaut": "bg-cyan-400",
-      "description": "Code BIC/SWIFT de la banque du vendeur."
-    },
-    {
-      "typeTextExtract": null,
-      "label": "Référence client",
-      "couleurDefaut": "bg-cyan-300",
-      "description": "Référence ou code client attribué par le vendeur."
-    },
-    {
-      "typeTextExtract": null,
-      "label": "Mentions légales",
-      "couleurDefaut": "bg-orange-500",
-      "description": "Mentions obligatoires, par exemple 'TVA non applicable, art. 293 B du CGI'."
-    },
-    {
-      "typeTextExtract": "RECEIVER_ADDRESS",
-      "label": "Adresse du client",
-      "couleurDefaut": "bg-orange-400",
-      "description": "Adresse complète de l’acheteur ou destinataire."
-    },
-    {
-      "typeTextExtract": "ITEM_NAME",
-      "label": "Désignation de l’article",
-      "couleurDefaut": "bg-pink-500",
-      "description": "Nom ou description de l’article ou service dans une ligne de facture."
-    },
-    {
-      "typeTextExtract": "PRICE",
-      "label": "Montant de la ligne",
-      "couleurDefaut": "bg-pink-400",
-      "description": "Prix total pour une ligne d’article (quantité × prix unitaire)."
-    },
-    {
-      "typeTextExtract": "QUANTITY",
-      "label": "Quantité",
-      "couleurDefaut": "bg-pink-300",
-      "description": "Quantité d’articles ou services dans une ligne de facture."
-    },
-    {
-      "typeTextExtract": null,
-      "label": "Prix unitaire",
-      "couleurDefaut": "bg-lime-500",
-      "description": "Prix unitaire de l’article ou service avant multiplication par la quantité."
-    },
-    {
-      "typeTextExtract": null,
-      "label": "Code article",
-      "couleurDefaut": "bg-lime-400",
-      "description": "Code ou référence de l’article (par exemple, SKU ou numéro interne)."
-    }
-  ]
+  {
+    "typeTextExtract": "VENDOR_NAME",
+    "label": "Nom du fournisseur",
+    "couleurDefaut": "bg-blue-500",
+    "description": "Nom du vendeur ou fournisseur émettant la facture."
+  },
+  {
+    "typeTextExtract": "VENDOR_ADDRESS",
+    "label": "Adresse du fournisseur",
+    "couleurDefaut": "bg-blue-400",
+    "description": "Adresse complète du vendeur, incluant rue, ville, état, code postal et pays."
+  },
+  {
+    "typeTextExtract": "VENDOR_PHONE",
+    "label": "Téléphone du fournisseur",
+    "couleurDefaut": "bg-blue-300",
+    "description": "Numéro de téléphone du vendeur pour contact."
+  },
+  {
+    "typeTextExtract": "VENDOR_URL",
+    "label": "Site web du fournisseur",
+    "couleurDefaut": "bg-blue-200",
+    "description": "URL du site web du vendeur, si présente sur la facture."
+  },
+  {
+    "typeTextExtract": "VENDOR_SIRET",
+    "label": "Numéro SIRET",
+    "couleurDefaut": "bg-indigo-500",
+    "description": "Numéro SIRET ou SIREN du vendeur, identifiant unique en France."
+  },
+  {
+    "typeTextExtract": "VENDOR_VAT_NUMBER",
+    "label": "Numéro de TVA intracommunautaire (fournisseur)",
+    "couleurDefaut": "bg-indigo-400",
+    "description": "Numéro de TVA intracommunautaire du vendeur (par exemple, FRXX123456789)."
+  },
+  {
+    "typeTextExtract": "VENDOR_ABN_NUMBER",
+    "label": "Numéro ABN du fournisseur",
+    "couleurDefaut": "bg-indigo-300",
+    "description": "Numéro ABN (Australian Business Number) du vendeur, si applicable."
+  },
+  {
+    "typeTextExtract": "VENDOR_GST_NUMBER",
+    "label": "Numéro GST du fournisseur",
+    "couleurDefaut": "bg-indigo-200",
+    "description": "Numéro GST (Goods and Services Tax) du vendeur, si applicable."
+  },
+  {
+    "typeTextExtract": "VENDOR_PAN_NUMBER",
+    "label": "Numéro PAN du fournisseur",
+    "couleurDefaut": "bg-indigo-100",
+    "description": "Numéro PAN (Permanent Account Number) du vendeur, si applicable."
+  },
+  {
+    "typeTextExtract": "INVOICE_RECEIPT_ID",
+    "label": "Numéro de facture",
+    "couleurDefaut": "bg-green-500",
+    "description": "Numéro unique identifiant la facture ou le reçu."
+  },
+  {
+    "typeTextExtract": "INVOICE_RECEIPT_DATE",
+    "label": "Date de facture",
+    "couleurDefaut": "bg-green-400",
+    "description": "Date d’émission de la facture ou du reçu."
+  },
+  {
+    "typeTextExtract": "DUE_DATE",
+    "label": "Date d’échéance",
+    "couleurDefaut": "bg-green-300",
+    "description": "Date limite pour le paiement de la facture."
+  },
+  {
+    "typeTextExtract": "ORDER_DATE",
+    "label": "Date de commande",
+    "couleurDefaut": "bg-teal-500",
+    "description": "Date à laquelle la commande a été passée."
+  },
+  {
+    "typeTextExtract": "DELIVERY_DATE",
+    "label": "Date de livraison",
+    "couleurDefaut": "bg-teal-400",
+    "description": "Date prévue ou effective de livraison des biens ou services."
+  },
+  {
+    "typeTextExtract": "SUBTOTAL",
+    "label": "Montant hors taxes (HT)",
+    "couleurDefaut": "bg-yellow-500",
+    "description": "Montant total hors taxes des biens ou services."
+  },
+  {
+    "typeTextExtract": "TAX",
+    "label": "Montant de la TVA",
+    "couleurDefaut": "bg-yellow-400",
+    "description": "Montant total des taxes appliquées (par exemple, TVA à 20 %)."
+  },
+  {
+    "typeTextExtract": "TAX_RATE",
+    "label": "Taux de TVA",
+    "couleurDefaut": "bg-yellow-300",
+    "description": "Taux de TVA appliqué (par exemple, 20 %, 5,5 %, 2,1 %)."
+  },
+  {
+    "typeTextExtract": "RECEIVER_VAT_NUMBER",
+    "label": "Numéro de TVA intracommunautaire (client)",
+    "couleurDefaut": "bg-indigo-300",
+    "description": "Numéro de TVA intracommunautaire de l’acheteur, si applicable."
+  },
+  {
+    "typeTextExtract": "RECEIVER_ABN_NUMBER",
+    "label": "Numéro ABN du client",
+    "couleurDefaut": "bg-indigo-200",
+    "description": "Numéro ABN (Australian Business Number) de l’acheteur, si applicable."
+  },
+  {
+    "typeTextExtract": "RECEIVER_GST_NUMBER",
+    "label": "Numéro GST du client",
+    "couleurDefaut": "bg-indigo-100",
+    "description": "Numéro GST (Goods and Services Tax) de l’acheteur, si applicable."
+  },
+  {
+    "typeTextExtract": "RECEIVER_PAN_NUMBER",
+    "label": "Numéro PAN du client",
+    "couleurDefaut": "bg-indigo-50",
+    "description": "Numéro PAN (Permanent Account Number) de l’acheteur, si applicable."
+  },
+  {
+    "typeTextExtract": "TOTAL",
+    "label": "Montant total TTC",
+    "couleurDefaut": "bg-lime-300",
+    "description": "Montant total toutes taxes comprises."
+  },
+  {
+    "typeTextExtract": "AMOUNT_DUE",
+    "label": "Montant dû",
+    "couleurDefaut": "bg-orange-300",
+    "description": "Montant restant à payer après déduction des paiements effectués."
+  },
+  {
+    "typeTextExtract": "AMOUNT_PAID",
+    "label": "Montant payé",
+    "couleurDefaut": "bg-green-200",
+    "description": "Montant déjà payé par l’acheteur."
+  },
+  {
+    "typeTextExtract": "DISCOUNT",
+    "label": "Remise",
+    "couleurDefaut": "bg-purple-500",
+    "description": "Réduction appliquée sur le montant total."
+  },
+  {
+    "typeTextExtract": "CUSTOMER_NUMBER",
+    "label": "Numéro de compte client",
+    "couleurDefaut": "bg-purple-400",
+    "description": "Numéro de compte attribué au client par le fournisseur."
+  },
+  {
+    "typeTextExtract": "ACCOUNT_NUMBER",
+    "label": "Numéro de compte",
+    "couleurDefaut": "bg-purple-300",
+    "description": "Numéro de compte bancaire ou de référence attribué au client."
+  },
+  {
+    "typeTextExtract": "PAYMENT_TERMS",
+    "label": "Conditions de paiement",
+    "couleurDefaut": "bg-purple-200",
+    "description": "Conditions de paiement, par exemple 'Net 30' ou 'À réception'."
+  },
+  {
+    "typeTextExtract": "CURRENCY",
+    "label": "Devise",
+    "couleurDefaut": "bg-gray-500",
+    "description": "Devise utilisée pour la facture (par exemple, EUR, USD)."
+  },
+  {
+    "typeTextExtract": "PO_NUMBER",
+    "label": "Numéro de bon de commande",
+    "couleurDefaut": "bg-gray-400",
+    "description": "Numéro du bon de commande associé à la facture."
+  },
+  {
+    "typeTextExtract": "IBAN",
+    "label": "IBAN",
+    "couleurDefaut": "bg-cyan-500",
+    "description": "Numéro IBAN du compte bancaire du vendeur pour le paiement."
+  },
+  {
+    "typeTextExtract": "BIC",
+    "label": "BIC",
+    "couleurDefaut": "bg-cyan-400",
+    "description": "Code BIC/SWIFT de la banque du vendeur."
+  },
+  {
+    "typeTextExtract": "CUSTOMER_REFERENCE",
+    "label": "Référence client",
+    "couleurDefaut": "bg-cyan-300",
+    "description": "Référence ou code client attribué par le vendeur."
+  },
+  {
+    "typeTextExtract": "LEGAL_NOTICES",
+    "label": "Mentions légales",
+    "couleurDefaut": "bg-orange-500",
+    "description": "Mentions obligatoires, par exemple 'TVA non applicable, art. 293 B du CGI'."
+  },
+  {
+    "typeTextExtract": "RECEIVER_ADDRESS",
+    "label": "Adresse du client",
+    "couleurDefaut": "bg-orange-400",
+    "description": "Adresse complète de l’acheteur ou destinataire, incluant rue, ville, état, code postal et pays."
+  },
+  {
+    "typeTextExtract": "RECEIVER_NAME",
+    "label": "Nom du client",
+    "couleurDefaut": "bg-orange-300",
+    "description": "Nom de l’acheteur ou destinataire de la facture."
+  },
+  {
+    "typeTextExtract": "RECEIVER_PHONE",
+    "label": "Téléphone du client",
+    "couleurDefaut": "bg-orange-200",
+    "description": "Numéro de téléphone de l’acheteur ou destinataire."
+  },
+  {
+    "typeTextExtract": "SERVICE_CHARGE",
+    "label": "Frais de service",
+    "couleurDefaut": "bg-yellow-200",
+    "description": "Frais supplémentaires pour services rendus."
+  },
+  {
+    "typeTextExtract": "GRATUITY",
+    "label": "Pourboire",
+    "couleurDefaut": "bg-yellow-100",
+    "description": "Montant du pourboire ajouté à la facture, si applicable."
+  },
+  {
+    "typeTextExtract": "PRIOR_BALANCE",
+    "label": "Solde antérieur",
+    "couleurDefaut": "bg-red-500",
+    "description": "Solde impayé antérieur porté sur la facture."
+  },
+  {
+    "typeTextExtract": "SHIPPING_HANDLING_CHARGE",
+    "label": "Frais d’expédition et de manutention",
+    "couleurDefaut": "bg-red-400",
+    "description": "Frais associés à l’expédition et à la manutention des biens."
+  },
+  {
+    "typeTextExtract": "ITEM",
+    "label": "Désignation de l’article",
+    "couleurDefaut": "bg-pink-500",
+    "description": "Nom ou description de l’article ou service dans une ligne de facture."
+  },
+  {
+    "typeTextExtract": "PRICE",
+    "label": "Montant de la ligne",
+    "couleurDefaut": "bg-pink-400",
+    "description": "Prix total pour une ligne d’article (quantité × prix unitaire)."
+  },
+  {
+    "typeTextExtract": "QUANTITY",
+    "label": "Quantité",
+    "couleurDefaut": "bg-pink-300",
+    "description": "Quantité d’articles ou services dans une ligne de facture."
+  },
+  {
+    "typeTextExtract": "UNIT_PRICE",
+    "label": "Prix unitaire",
+    "couleurDefaut": "bg-lime-500",
+    "description": "Prix unitaire de l’article ou service avant multiplication par la quantité."
+  },
+  {
+    "typeTextExtract": "PRODUCT_CODE",
+    "label": "Code article",
+    "couleurDefaut": "bg-lime-400",
+    "description": "Code ou référence de l’article (par exemple, SKU ou numéro interne)."
+  },
+  {
+    "typeTextExtract": "ADDRESS_BLOCK",
+    "label": "Bloc d’adresse",
+    "couleurDefaut": "bg-blue-100",
+    "description": "Adresse complète (fournisseur, client, facturation, livraison, etc.)."
+  },
+  {
+    "typeTextExtract": "STREET",
+    "label": "Rue",
+    "couleurDefaut": "bg-blue-50",
+    "description": "Nom de la rue pour toute adresse mentionnée."
+  },
+  {
+    "typeTextExtract": "CITY",
+    "label": "Ville",
+    "couleurDefaut": "bg-teal-300",
+    "description": "Ville pour toute adresse mentionnée."
+  },
+  {
+    "typeTextExtract": "STATE",
+    "label": "État",
+    "couleurDefaut": "bg-teal-200",
+    "description": "État ou région pour toute adresse mentionnée."
+  },
+  {
+    "typeTextExtract": "COUNTRY",
+    "label": "Pays",
+    "couleurDefaut": "bg-teal-100",
+    "description": "Pays pour toute adresse mentionnée."
+  },
+  {
+    "typeTextExtract": "ZIP_CODE",
+    "label": "Code postal",
+    "couleurDefaut": "bg-teal-50",
+    "description": "Code postal pour toute adresse mentionnée."
+  }
+]
