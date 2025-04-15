@@ -6,32 +6,43 @@ import FormCardInputDynamique from "@/container/FormCanvasDynamique/FormCardInpu
 import { InvoiceElement } from "@/utils/canvas.action";
 import { Button } from "@/components/ui/button";
 import { formBoxsAtom } from "@/atom/canvas.atom";
-import { formAddInvoiceElement, getReadyForPrintAction } from "@/utils/facture.action";
+import { formAddInvoiceElement, getReadyForPrintAction, generateCsvFromReadyForPrint } from "@/utils/facture.action";
 import { invoiceElementFinalRawAtom, invoiceIdAtom } from "@/atom/facture.atom";
 import PrintDataModal from "../PrintDataModal/PrintDataModal";
 
 export default function FormCanvasListDynamique() {
-
-
     const [invoiceId, setInvoiceId] = useAtom(invoiceIdAtom);
     const [formBoxs, setFormBoxs] = useAtom(formBoxsAtom);
     const [isModalOpen, setIsModalOpen] = useState(false);
+    const [invoiceElementFinalRaw, setinvoceElementFinalRaw] = useAtom(invoiceElementFinalRawAtom);
 
-
-
-
-    const [invoiceElementFinalRaw, setinvoceElementFinalRaw] = useAtom(invoiceElementFinalRawAtom);//todo prerender des élément validé non envoyé
-    // Utilisation de useActionState pour l'action d'impression
-    const [printState, printAction, isPrintPending] = useActionState(getReadyForPrintAction, {
+    const [modalState, modalAction, isModalPending] = useActionState(getReadyForPrintAction, {
         success: false,
         error: null,
-        message: '',
+        message: "",
+        data: [],
+    });
+    const [printState, printAction, isPrintPending] = useActionState(generateCsvFromReadyForPrint, {
+        success: false,
+        error: null,
+        message: "",
         data: [],
     });
 
     useEffect(() => {
-        if (printState.success && printState.data.length > 0) {
+        if (modalState.success && modalState.data.length > 0) {
             setIsModalOpen(true);
+        }
+    }, [modalState]);
+
+    useEffect(() => {
+        if (printState.success && printState.message) {
+            const link = document.createElement("a");
+            link.href = printState.message;
+            link.download = `factures-${Date.now()}.csv`;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
         }
     }, [printState]);
 
@@ -55,6 +66,12 @@ export default function FormCanvasListDynamique() {
         setFormBoxs((prev) => [...prev, newElement]);
     };
 
+    const handleClickPrint = () => {
+        const formData = new FormData();
+        formData.append("userId", "2");
+        formData.append("firmAccountingId", "1");
+        printAction(formData);
+    };
 
     const closeModal = () => {
         setIsModalOpen(false);
@@ -108,12 +125,9 @@ export default function FormCanvasListDynamique() {
                         {isPending ? "Soumission..." : "Soumettre le formulaire"}
                     </Button>
                 )}
-                {state?.message && (
-                    <p className="mt-2 text-sm text-red-500">{state.message}</p>
-                )}
+                {state?.message && <p className="mt-2 text-sm text-red-500">{state.message}</p>}
             </form>
-            {/* Formulaire séparé pour l'action d'impression */}
-            <form action={printAction} className="mt-6 space-y-4">
+            <form action={modalAction} className="mt-6 space-y-4">
                 <div>
                     <label htmlFor="firmAccountingId" className="block text-sm font-medium mb-1">
                         ID de la société comptable :
@@ -122,6 +136,7 @@ export default function FormCanvasListDynamique() {
                         type="number"
                         id="firmAccountingId"
                         name="firmAccountingId"
+                        defaultValue="1"
                         required
                         className="w-full p-2 border border-gray-300 rounded"
                         placeholder="Entrez l'ID de la société"
@@ -135,6 +150,7 @@ export default function FormCanvasListDynamique() {
                         type="number"
                         id="userId"
                         name="userId"
+                        defaultValue="2"
                         className="w-full p-2 border border-gray-300 rounded"
                         placeholder="Entrez l'ID de l'utilisateur (facultatif)"
                     />
@@ -142,34 +158,33 @@ export default function FormCanvasListDynamique() {
                 <Button
                     type="submit"
                     className="w-full bg-purple-500 hover:bg-purple-600"
-                    disabled={isPrintPending}
+                    disabled={isModalPending}
                 >
-                    {isPrintPending ? "Chargement des données..." : "Récupérer données impression"}
+                    {isModalPending ? "Chargement des données..." : "Récupérer données impression"}
                 </Button>
             </form>
-
-            {/* Affichage des erreurs ou messages hors de la modale */}
+            {modalState.error && (
+                <p className="mt-2 text-sm text-red-500">Erreur : {modalState.error}</p>
+            )}
+            {modalState.success && modalState.message && modalState.data.length === 0 && (
+                <p className="mt-2 text-sm text-blue-500">{modalState.message}</p>
+            )}
             {printState.error && (
                 <p className="mt-2 text-sm text-red-500">Erreur : {printState.error}</p>
             )}
-            {printState.success && printState.message && printState.data.length === 0 && (
-                <p className="mt-2 text-sm text-blue-500">{printState.message}</p>
-            )}
-            {printState.success && printState.data.length === 0 && (
+            {printState.success && printState.data.length === 0 && !printState.message && (
                 <p className="mt-2 text-sm text-gray-500">
                     Aucune facture trouvée pour cette société comptable.
                 </p>
             )}
-
-            {/* Modale pour afficher les données récupérées */}
-            {isModalOpen && (
-                <PrintDataModal
-                    data={printState.data}
-                    onClose={closeModal}
-                />
-            )}
-
-
+            {isModalOpen && <PrintDataModal data={modalState.data} onClose={closeModal} />}
+            <Button
+                onClick={handleClickPrint}
+                disabled={isPrintPending}
+                className="mt-4 bg-blue-500 hover:bg-blue-600"
+            >
+                {isPrintPending ? "Chargement..." : "Télécharger le CSV"}
+            </Button>
         </div>
     );
 }

@@ -254,3 +254,93 @@ export async function getReadyForPrintAction(prevState: ActionState, formData: F
         };
     }
 }
+
+
+export async function generateCsvFromReadyForPrint(
+    prevState: ActionState,
+    formData: FormData
+): Promise<ActionState> {
+    const firmAccountingIdRaw = formData.get('firmAccountingId');
+    const userIdRaw = formData.get('userId');
+
+    const firmAccountingId = firmAccountingIdRaw ? String(firmAccountingIdRaw) : null;
+    const userId = userIdRaw ? String(userIdRaw) : null;
+
+    try {
+        if (!firmAccountingId) {
+            return {
+                success: false,
+                error: 'Le paramètre firmAccountingId est requis',
+                data: [],
+                message: '',
+            };
+        }
+
+        const result = await fetchReadyForPrint(firmAccountingId, userId);
+
+        if (!result.success || !result.data) {
+            return {
+                success: false,
+                error: 'Aucune donnée disponible pour générer le CSV',
+                data: [],
+                message: '',
+            };
+        }
+
+        const formattedData = result.data.map((item: any) => ({
+            invoiceId: item.id || item.invoiceId,
+            ...item,
+        }));
+
+        const uniqueKeys = Array.from(
+            new Set(
+                formattedData.flatMap((row: any) =>
+                    Object.keys(row).filter((key) => key !== 'invoiceId')
+                )
+            )
+        );
+
+        const headers = ['invoiceId', ...uniqueKeys];
+        const csvRows = [
+            headers.join(','),
+            ...formattedData.map((row: any) =>
+                headers
+                    .map((key) => {
+                        const value = row[key] ?? '';
+                        return `"${String(value).replace(/"/g, '""')}"`;
+                    })
+                    .join(',')
+            ),
+        ];
+
+        // Ajouter le BOM pour UTF-8
+        const BOM = '\uFEFF';
+        const csvContent = BOM + csvRows.join('\n');
+
+        // Générer le base64 avec le BOM inclus
+        const base64Csv = Buffer.from(csvContent).toString('base64');
+
+        return {
+            success: true,
+            message: `data:text/csv;base64,${base64Csv}`,
+            data: [],
+            error: null,
+        };
+    } catch (error: unknown) {
+        if (error instanceof Error) {
+            return {
+                success: false,
+                error: error.message,
+                data: [],
+                message: '',
+            };
+        }
+        return {
+            success: false,
+            error: String(error),
+            data: [],
+            message: '',
+        };
+    }
+}
+
