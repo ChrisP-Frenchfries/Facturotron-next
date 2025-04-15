@@ -70,7 +70,10 @@ async function fetchReadyForPrint(firmAccountingId: string | number, userId: str
 
 
 
-// Server Action pour envoyer le fichier et les paramètres à l'API
+
+
+
+
 export async function uploadDocument(
     prevState: { message: string | null },
     formData: FormData
@@ -79,16 +82,21 @@ export async function uploadDocument(
         const clientId = formData.get("clientId") as string;
         const userId = formData.get("userId") as string;
         const file = formData.get("document") as File;
+        const isSmartDetect = formData.get("isSmartDetect") as string;
 
+        // Validation des champs requis
         if (!clientId || !userId || !file) {
-            return { message: "Tous les champs sont requis" };
+            return { message: "Tous les champs (clientId, userId, document) sont requis" };
         }
 
+        // Créer le corps de la requête
         const body = new FormData();
         body.append("clientId", clientId);
         body.append("userId", userId);
         body.append("document", file);
+        body.append("isSmartDetect", isSmartDetect || "false"); // Par défaut false si non fourni
 
+        // Envoyer la requête à l'API
         const response = await fetch("http://localhost:4242/api/facture/", {
             method: "POST",
             body,
@@ -100,18 +108,16 @@ export async function uploadDocument(
 
         const result: ApiResponseAdd = await response.json();
 
-
         return {
             message: result.message || "Document envoyé avec succès !",
             invoiceId: result.invoiceId,
-            filePath: result.lienClientFichier
+            filePath: result.lienClientFichier,
         };
     } catch (error) {
         console.error("Erreur lors de l'upload:", error);
-        return { message: "Erreur lors de l'envoi du document" };
+        return { message: `Erreur lors de l'envoi du document: ${error.message}` };
     }
 }
-
 
 
 
@@ -256,6 +262,8 @@ export async function getReadyForPrintAction(prevState: ActionState, formData: F
 }
 
 
+
+
 export async function generateCsvFromReadyForPrint(
     prevState: ActionState,
     formData: FormData
@@ -271,6 +279,15 @@ export async function generateCsvFromReadyForPrint(
             return {
                 success: false,
                 error: 'Le paramètre firmAccountingId est requis',
+                data: [],
+                message: '',
+            };
+        }
+
+        if (!userId) {
+            return {
+                success: false,
+                error: 'Le paramètre userId est requis pour la validation des factures',
                 data: [],
                 message: '',
             };
@@ -320,6 +337,36 @@ export async function generateCsvFromReadyForPrint(
         // Générer le base64 avec le BOM inclus
         const base64Csv = Buffer.from(csvContent).toString('base64');
 
+        // Extraire les invoiceIds pour la validation
+        const invoiceIds = formattedData
+            .map((item: any) => item.invoiceId)
+            .filter((id: any) => typeof id === 'number' && id > 0);
+
+        // Valider les factures via l'API
+        if (invoiceIds.length > 0) {
+            const validationResponse = await fetch('http://localhost:4242/api/facture/ready', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    invoiceIds,
+                    userId: parseInt(userId, 10),
+                }),
+            });
+
+            const validationResult = await validationResponse.json();
+
+            if (!validationResult.success) {
+                return {
+                    success: true, // Le CSV est généré, donc on ne bloque pas le téléchargement
+                    message: `data:text/csv;base64,${base64Csv}`,
+                    data: [],
+                    error: `CSV généré, mais erreur lors de la validation des factures : ${validationResult.error}`,
+                };
+            }
+        }
+
         return {
             success: true,
             message: `data:text/csv;base64,${base64Csv}`,
@@ -344,3 +391,45 @@ export async function generateCsvFromReadyForPrint(
     }
 }
 
+
+
+
+
+
+export type FetchElementsResponse = {
+    success: boolean;
+    data?: InvoiceElement[];
+    error?: string;
+};
+
+export async function fetchInvoiceElements(invoiceId: number): Promise<FetchElementsResponse> {
+    try {
+        if (!invoiceId || invoiceId <= 0) {
+            return { success: false, error: "invoiceId invalide" };
+        }
+
+        const response = await fetch(`http://localhost:4242/api/facture/elements?invoiceId=${invoiceId}`, {
+            method: "GET",
+            headers: {
+                "Content-Type": "application/json",
+            },
+        });
+
+        if (!response.ok) {
+            throw new Error(`Erreur API: ${response.status}`);
+        }
+
+        const result = await response.json();
+
+        return {
+            success: true,
+            data: result.invoice.Elements,
+        };
+    } catch (error) {
+        console.error("Erreur lors de la récupération des invoiceElements:", error);
+        return {
+            success: false,
+            error: `Erreur lors de la récupération des éléments: ${error.message}`,
+        };
+    }
+}
