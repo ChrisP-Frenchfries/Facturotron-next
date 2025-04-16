@@ -1,4 +1,3 @@
-// components/LabelFieldSelector.tsx
 "use client";
 
 import { useState, useEffect } from "react";
@@ -28,6 +27,7 @@ export interface LabelField {
     label: string;
     couleurDefaut: string;
     description: string;
+    isAllowed?: boolean;
 }
 
 // Props pour le composant
@@ -54,6 +54,9 @@ export default function LabelFieldSelector({ atom }: LabelFieldSelectorProps) {
         setOpen(false);
     };
 
+    // Filtrer les champs pour n'afficher que ceux avec isAllowed: true
+    const allowedFields = labelFields.filter((field) => field.isAllowed === true);
+
     return (
         <div className="w-full">
             <Popover open={open} onOpenChange={setOpen}>
@@ -74,7 +77,7 @@ export default function LabelFieldSelector({ atom }: LabelFieldSelectorProps) {
                         <CommandList>
                             <CommandEmpty>Aucun champ trouvé.</CommandEmpty>
                             <CommandGroup>
-                                {labelFields.map((field) => (
+                                {allowedFields.map((field) => (
                                     <CommandItem
                                         key={field.label}
                                         value={field.label}
@@ -94,16 +97,6 @@ export default function LabelFieldSelector({ atom }: LabelFieldSelectorProps) {
                     </Command>
                 </PopoverContent>
             </Popover>
-
-            {/* Affichage de l'objet sélectionné pour démo */}
-            {/* {selectedField && (
-                <div className="mt-4 p-4 bg-gray-50 rounded-md">
-                    <h3 className="text-sm font-medium text-gray-900">Champ sélectionné :</h3>
-                    <pre className="mt-2 text-sm text-gray-600">
-                        {JSON.stringify(selectedField, null, 2)}
-                    </pre>
-                </div>
-            )} */}
         </div>
     );
 }
