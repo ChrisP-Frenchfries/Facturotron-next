@@ -7,12 +7,23 @@ import { InvoiceElement } from "@/utils/canvas.action";
 import { Button } from "@/components/ui/button";
 import { formBoxsAtom } from "@/atom/canvas.atom";
 import { formAddInvoiceElement, getReadyForPrintAction, generateCsvFromReadyForPrint } from "@/utils/facture.action";
-import { invoiceElementFinalRawAtom, invoiceIdAtom } from "@/atom/facture.atom";
+import { allowedLabelFieldsAtom, invoiceElementFinalRawAtom, invoiceIdAtom } from "@/atom/facture.atom";
 import PrintDataModal from "../PrintDataModal/PrintDataModal";
 
+// Interface pour LabelField (correspond à la structure de labelFields.json)
+export interface LabelField {
+    typeTextExtract: string | null;
+    label: string;
+    couleurDefaut: string;
+    description: string;
+    isAllowed?: boolean;
+}
+
+// Composant principal
 export default function FormCanvasListDynamique() {
     const [invoiceId, setInvoiceId] = useAtom(invoiceIdAtom);
     const [formBoxs, setFormBoxs] = useAtom(formBoxsAtom);
+    const [allowedLabelFields] = useAtom(allowedLabelFieldsAtom);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [invoiceElementFinalRaw, setinvoceElementFinalRaw] = useAtom(invoiceElementFinalRawAtom);
 
@@ -86,6 +97,15 @@ export default function FormCanvasListDynamique() {
         setFormBoxs([]);
     };
 
+    // Filtrer les formBoxs pour n'afficher que ceux dont le typeTextExtract est dans allowedLabelFields
+    const filteredFormBoxs = formBoxs.filter((formBox) => {
+        const selectedLabelField = formBox.selectedLabelField;
+        if (!selectedLabelField || !selectedLabelField.typeTextExtract) return false;
+        return allowedLabelFields.some(
+            (field) => field.typeTextExtract === selectedLabelField.typeTextExtract
+        );
+    });
+
     return (
         <div className="p-4">
             <Button
@@ -106,12 +126,12 @@ export default function FormCanvasListDynamique() {
                 <input type="hidden" name="invoiceId" value={invoiceId ? String(invoiceId) : ""} />
                 <input type="hidden" name="formBoxs" value={JSON.stringify(formBoxs)} />
                 <div className="space-y-4">
-                    {formBoxs.length === 0 ? (
+                    {filteredFormBoxs.length === 0 ? (
                         <p className="text-muted-foreground">
                             Aucun champ pour l'instant. Ajoutez-en un pour commencer.
                         </p>
                     ) : (
-                        formBoxs.map((element) => (
+                        filteredFormBoxs.map((element) => (
                             <FormCardInputDynamique key={element.id} {...element} />
                         ))
                     )}
