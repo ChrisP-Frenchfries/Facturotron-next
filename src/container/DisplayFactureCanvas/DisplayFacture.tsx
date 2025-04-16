@@ -1,4 +1,4 @@
-"use client"; // Nécessaire pour CanvasDrawing et useActionState
+"use client";
 
 import { invoiceIdAtom, pathFileAtom } from "@/atom/facture.atom";
 import { InvoiceElement, makeInvoiceElements } from "@/utils/canvas.action";
@@ -34,15 +34,15 @@ export type SubmitResult = {
 } | null;
 
 export default function DisplayFacture() {
-    const [invoiceId] = useAtom(invoiceIdAtom); // Récupérer invoiceId depuis l'atome
+    const [invoiceId] = useAtom(invoiceIdAtom);
     const [pathFile] = useAtom(pathFileAtom);
     const [imageUrl, setImageUrl] = useState<string | null>(null);
     const [imageLoading, setImageLoading] = useState(false);
     const [imageError, setImageError] = useState<string | null>(null);
-    const [boundingBoxes, setBoundingBoxes] = useAtom(boundingBoxesAtom); // Bounding boxes de base
-    const [isActiveDrawing, setIsActiveDrawing] = useAtom(activeCanvasDrawingAtom); // Contrôle du dessin
-    const [showInputValue, setShowInputValue] = useAtom(activeInputValueAtom); // Contrôle des input values
-    const [formBoxs, setformBoxs] = useAtom(formBoxsAtom); // Atome pour les invoiceElements
+    const [boundingBoxes, setBoundingBoxes] = useAtom(boundingBoxesAtom);
+    const [isActiveDrawing, setIsActiveDrawing] = useAtom(activeCanvasDrawingAtom);
+    const [showInputValue, setShowInputValue] = useAtom(activeInputValueAtom);
+    const [formBoxs, setformBoxs] = useAtom(formBoxsAtom);
 
     const imageRef = useRef<HTMLImageElement | null>(null);
 
@@ -51,7 +51,7 @@ export default function DisplayFacture() {
             setImageUrl(null);
             setImageError(null);
             setImageLoading(false);
-            setformBoxs([]); // Réinitialiser formBoxs si pas de pathFile
+            setformBoxs([]);
             return;
         }
 
@@ -62,38 +62,35 @@ export default function DisplayFacture() {
             setImageError(null);
 
             try {
-                // Paralléliser le chargement de l'image et des invoiceElements
                 const [imageResult, elementsResult] = await Promise.all([
                     fetchInvoiceImage(pathFile),
                     invoiceId ? fetchInvoiceElements(invoiceId) : Promise.resolve({ success: false, data: [] }),
                 ]);
 
                 if (isMounted) {
-                    // Gérer le résultat de l'image
                     if (imageResult.success) {
-                        setImageUrl(imageResult.data); // Base64 data URL
+                        setImageUrl(imageResult.data);
                     } else {
                         setImageError(imageResult.error);
                         setImageUrl(null);
                     }
                     setImageLoading(false);
 
-                    // Gérer le résultat des invoiceElements
                     if (elementsResult.success && elementsResult.data) {
-                        setformBoxs(elementsResult.data); // Remplir formBoxs avec les invoiceElements
+                        setformBoxs(elementsResult.data);
                     } else {
-                        setformBoxs([]); // Réinitialiser si aucune donnée
+                        setformBoxs([]);
                         if (elementsResult.error) {
-                            setImageError(elementsResult.error); // Afficher l'erreur (optionnel)
+                            setImageError(elementsResult.error);
                         }
                     }
                 }
-            } catch (error) {
+            } catch (error: any) {
                 if (isMounted) {
                     setImageError(`Erreur lors du chargement: ${error.message}`);
                     setImageUrl(null);
                     setImageLoading(false);
-                    setformBoxs([]); // Réinitialiser en cas d'erreur
+                    setformBoxs([]);
                 }
             }
         };
@@ -108,26 +105,34 @@ export default function DisplayFacture() {
         };
     }, [pathFile, invoiceId, setformBoxs]);
 
-    // Utilisation de useActionState avec invoiceId inclus via closure
     const [submitState, submitAction, isPending] = useActionState<SubmitResult, BoundingBox[]>(
         async (_previousState: SubmitResult, validBoxes: BoundingBox[]) => {
-            console.log("validbox: ici ce passe mon opération correctement: validbox:", validBoxes)
             if (!invoiceId) {
                 return { success: false, error: "ID de facture manquant" };
             }
-            return await makeInvoiceElements(invoiceId, validBoxes); // Passer invoiceId et validBoxes
+            console.log("Submitting boxes:", validBoxes);
+            return await makeInvoiceElements(invoiceId, validBoxes);
         },
         null
     );
 
-    // Effet pour mettre à jour l'atome quand submitState change
     useEffect(() => {
-        // Ne mettre à jour que si submitState existe et que l'action a réussi
         if (submitState?.success && Array.isArray(submitState.elements)) {
-            setformBoxs([...submitState.elements, ...formBoxs]); // Ajouter les nouveaux éléments
-            setBoundingBoxes([]); // Vider les boundingBoxes
+            console.log("Updating formBoxs with:", submitState.elements);
+            setformBoxs((prev) => {
+                // Éviter les mises à jour si les données sont identiques
+                const newElements = submitState.elements!;
+                if (
+                    prev.length === newElements.length &&
+                    prev.every((item, i) => item.id === newElements[i].id)
+                ) {
+                    return prev;
+                }
+                return [...newElements, ...prev];
+            });
+            setBoundingBoxes([]); // Vider boundingBoxes pour permettre de nouvelles créations
         }
-    }, [submitState, setformBoxs, formBoxs, setBoundingBoxes]);
+    }, [submitState, setformBoxs, setBoundingBoxes]);
 
     const handleNewDrawing = () => {
         setIsActiveDrawing(!isActiveDrawing);
@@ -144,7 +149,7 @@ export default function DisplayFacture() {
             return;
         }
         startTransition(() => {
-            submitAction(validBoxes); // Passer uniquement validBoxes, invoiceId est capturé par closure
+            submitAction(validBoxes);
         });
     };
 

@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useAtom } from "jotai";
-import { activeCanvasDrawingAtom } from "@/atom/canvas.atom"; // Ajustez le chemin selon votre structure
+import { activeCanvasDrawingAtom } from "@/atom/canvas.atom";
 
 interface BoundingBox {
     Top: number;
@@ -32,21 +32,19 @@ export default function CanvasDrawing({
         handle: string;
     } | null>(null);
     const [tempBox, setTempBox] = useState<BoundingBox | null>(null);
-    const [isActive] = useAtom(activeCanvasDrawingAtom); // Utiliser l'atome
+    const [isActive] = useAtom(activeCanvasDrawingAtom);
 
     const MIN_SIZE = 0.001;
 
     const handleMouseDown = (e: React.MouseEvent<HTMLDivElement>) => {
-        if (!isActive) return; // Désactiver la création si isActive est false
+        if (!isActive) return;
 
         e.preventDefault();
-        console.log("Mouse down triggered on CanvasDrawing");
         if (!imageRef.current || isDragging !== null || isResizing !== null) return;
 
         const rect = imageRef.current.getBoundingClientRect();
         const x = e.clientX - rect.left;
         const y = e.clientY - rect.top;
-        console.log("Starting drawing at:", { x, y });
 
         setIsDrawing(true);
         setStartPos({ x, y });
@@ -57,11 +55,10 @@ export default function CanvasDrawing({
         index: number,
         handle?: "top-left" | "top-right" | "bottom-left" | "bottom-right"
     ) => {
-        if (!isActive) return; // Désactiver la gestion si isActive est false
+        if (!isActive) return;
 
         e.preventDefault();
         e.stopPropagation();
-        console.log("Canvas mouse down:", { index, handle });
 
         if (!imageRef.current) return;
 
@@ -98,9 +95,20 @@ export default function CanvasDrawing({
                 Width: Math.max(MIN_SIZE, width / imageWidth),
                 Height: Math.max(MIN_SIZE, height / imageHeight),
             };
-            console.log("Drawing temp box:", newBox);
 
-            setTempBox(newBox);
+            setTempBox((prev) => {
+                // Éviter les mises à jour inutiles
+                if (
+                    prev &&
+                    prev.Top === newBox.Top &&
+                    prev.Left === newBox.Left &&
+                    prev.Width === newBox.Width &&
+                    prev.Height === newBox.Height
+                ) {
+                    return prev;
+                }
+                return newBox;
+            });
         } else if (isDragging !== null && startPos) {
             const dx = (currentX - startPos.x) / imageWidth;
             const dy = (currentY - startPos.y) / imageHeight;
@@ -108,14 +116,29 @@ export default function CanvasDrawing({
             setBoundingBoxes((prev) => {
                 const updated = [...prev];
                 const box = updated[isDragging];
+                const newLeft = Math.max(0, Math.min(1 - box.Width, box.Left + dx));
+                const newTop = Math.max(0, Math.min(1 - box.Height, box.Top + dy));
+
+                // Éviter les mises à jour si la position n'a pas changé
+                if (box.Left === newLeft && box.Top === newTop) {
+                    return prev;
+                }
+
                 updated[isDragging] = {
                     ...box,
-                    Left: Math.max(0, Math.min(1 - box.Width, box.Left + dx)),
-                    Top: Math.max(0, Math.min(1 - box.Height, box.Top + dy)),
+                    Left: newLeft,
+                    Top: newTop,
                 };
                 return updated;
             });
-            setStartPos({ x: currentX, y: currentY });
+
+            // Mettre à jour startPos uniquement si nécessaire
+            setStartPos((prev) => {
+                if (prev && prev.x === currentX && prev.y === currentY) {
+                    return prev;
+                }
+                return { x: currentX, y: currentY };
+            });
         } else if (isResizing && startPos) {
             const { index, handle } = isResizing;
             const dx = (currentX - startPos.x) / imageWidth;
@@ -161,16 +184,32 @@ export default function CanvasDrawing({
                 }
                 box.Width = Math.max(MIN_SIZE, box.Width);
                 box.Height = Math.max(MIN_SIZE, box.Height);
+
+                // Éviter les mises à jour si la boîte n'a pas changé
+                if (
+                    box.Left === updated[index].Left &&
+                    box.Top === updated[index].Top &&
+                    box.Width === updated[index].Width &&
+                    box.Height === updated[index].Height
+                ) {
+                    return prev;
+                }
+
                 updated[index] = box;
                 return updated;
             });
-            setStartPos({ x: currentX, y: currentY });
+
+            setStartPos((prev) => {
+                if (prev && prev.x === currentX && prev.y === currentY) {
+                    return prev;
+                }
+                return { x: currentX, y: currentY };
+            });
         }
     };
 
     const handleMouseUp = (e: React.MouseEvent<HTMLDivElement>) => {
         e.preventDefault();
-        console.log("Mouse up triggered");
         if (isDrawing && tempBox) {
             setIsDrawing(false);
             setStartPos(null);
@@ -184,7 +223,7 @@ export default function CanvasDrawing({
     };
 
     const handleDeleteBox = (index: number) => {
-        if (!isActive) return; // Désactiver la suppression si isActive est false
+        if (!isActive) return;
         setBoundingBoxes((prev) => prev.filter((_, i) => i !== index));
     };
 
@@ -196,7 +235,7 @@ export default function CanvasDrawing({
                 left: 0,
                 width: "100%",
                 height: "100%",
-                zIndex: isActive ? 50 : 10, // z-index 50 si actif, 10 sinon
+                zIndex: isActive ? 50 : 10,
             }}
             onMouseDown={handleMouseDown}
             onMouseMove={handleMouseMove}
@@ -212,7 +251,7 @@ export default function CanvasDrawing({
                         width: `${box.Width * 100}%`,
                         height: `${box.Height * 100}%`,
                         border: "2px solid red",
-                        cursor: isActive ? "move" : "default", // Curseur inactif si non actif
+                        cursor: isActive ? "move" : "default",
                     }}
                     onMouseDown={(e) => handleCanvasMouseDown(e, index)}
                 >
@@ -225,7 +264,7 @@ export default function CanvasDrawing({
                             height: "10px",
                             background: "blue",
                             cursor: isActive ? "nwse-resize" : "default",
-                            display: isActive ? "block" : "none", // Cacher les poignées si inactif
+                            display: isActive ? "block" : "none",
                         }}
                         onMouseDown={(e) => handleCanvasMouseDown(e, index, "top-left")}
                     />
@@ -282,7 +321,7 @@ export default function CanvasDrawing({
                             cursor: isActive ? "pointer" : "default",
                             fontSize: "10px",
                             zIndex: 20,
-                            display: isActive ? "block" : "none", // Cacher le bouton de suppression si inactif
+                            display: isActive ? "block" : "none",
                         }}
                         onClick={(e) => {
                             e.stopPropagation();

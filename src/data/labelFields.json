@@ -7,6 +7,13 @@
     "isAllowed": true
   },
   {
+    "typeTextExtract": "Nouveau champ",
+    "label": "Nouveau champ",
+    "couleurDefaut": "bg-red-500",
+    "description": "Nouveau champ.",
+    "isAllowed": true
+  },
+  {
     "typeTextExtract": "VENDOR_ADDRESS",
     "label": "Adresse du fournisseur",
     "couleurDefaut": "bg-blue-400",

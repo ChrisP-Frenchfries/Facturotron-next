@@ -1,32 +1,3 @@
-
-//todo ici on va procéder a la création/modification  d'un invoice_elements
-
-//todo l'invoice element a un id: clef en db (generation en DB, pas ici)
-
-//todo un invoce id FK de invoices
-
-//todo un field_type :
-//? (faire un patern de class ? , c'est les champ comptable/pris en charge par l'ocr,
-//?  potentiellement selectionnable depuis une liste dynamique)
-//?  en fonction du field type il a un designe special
-//?  possibilité d'ajouter des field type
-
-//todo field_value: (defini ici par une formule pour recupe le contenu des blocks donc fetch de block de invocieId)
-
-//todo evidement la boundingbox
-
-//todo confidence : récupération du taux de confidence du block le moins fiable
-
-
-
-// await call db pour recup les blocks par id (faire la route)
-
-// recuperation de la facture via l'atome
-
-//creation des elementBoxs
-
-
-
 "use server";
 
 import { LabelField } from "@/container/FormCanvasDynamique/LabelFieldSelector";
@@ -67,8 +38,11 @@ export interface InvoiceElement {
     blocks: any[];
     confidence: number;
     inputValue?: string;
-    selectedLabelField?: LabelField | null; // Assurez-vous que ceci est inclus
+    selectedLabelField?: LabelField | null;
 }
+
+
+
 /**
  * Vérifie si un bloc est entièrement à l'intérieur d'une BoundingBox.
  */
@@ -84,10 +58,12 @@ function isBlockFullyInsideBoundingBox(block: Block, boundingBox: BoundingBox): 
     const blockBottom = blockBB.Top + blockBB.Height;
 
     // Vérifier si le bloc est entièrement à l'intérieur des limites
-    return blockBB.Top >= boundingBox.Top &&
+    return (
+        blockBB.Top >= boundingBox.Top &&
         blockBottom <= bottom &&
         blockBB.Left >= boundingBox.Left &&
-        blockRight <= right;
+        blockRight <= right
+    );
 }
 
 export async function makeInvoiceElements(
@@ -107,47 +83,73 @@ export async function makeInvoiceElements(
         // Conversion de la réponse en JSON
         const data: InvoiceResponse = await response.json();
         const blocks = data.invoice.Blocks;
+        console.log(`Fetched ${blocks.length} blocks for invoiceId ${invoiceId}`);
 
         // Création des éléments de facture
-        const invoiceElements: InvoiceElement[] = boundingBoxes.map(box => {
+        const invoiceElements: InvoiceElement[] = boundingBoxes.map((box, index) => {
+            // ID temporaire (sera remplacé par la DB lors de l'enregistrement)
             const id = nanoid();
 
             // Filtrer les blocs qui sont entièrement à l'intérieur de la bounding box
-            const boxBlocks = blocks.filter(block => isBlockFullyInsideBoundingBox(block, box));
+            const boxBlocks = blocks.filter((block) =>
+                isBlockFullyInsideBoundingBox(block, box)
+            );
 
-            // Calculer la confiance minimale parmi tous les blocs (si disponible)
+            // Calculer la confiance minimale parmi tous les blocs
             const confidence = boxBlocks.reduce((minConf, block) => {
                 if (block.Confidence !== undefined && block.Confidence < minConf) {
                     return block.Confidence;
                 }
                 return minConf;
-            }, 0); // Commencer avec 0% de confiance
+            }, 100); // Commencer avec 100% pour gérer le cas où aucun bloc n'a de Confidence
+
+            // Calculer l'inputValue en concatenant les Text des blocs
+            const inputValue = boxBlocks
+                .filter((block) => block.Text)
+                .map((block) => block.Text)
+                .join(" ")
+                .trim();
+
+            // Définir le selectedLabelField avec typeTextExtract: "Nouveau champ"
+            const selectedLabelField: LabelField = {
+                typeTextExtract: "Nouveau champ",
+                label: `Champ ${index + 1}`, // Label par défaut
+                couleurDefaut: "bg-red-500", // Bleu par défaut
+                description: "Champ créé automatiquement",
+                isAllowed: true, // Autorisé par défaut
+            };
 
             // Créer l'élément de facture
-            return {
+            const element: InvoiceElement = {
                 id,
-                nom: "", // À définir selon votre logique métier
+                nom: selectedLabelField.label, // Utiliser le label comme nom
                 boundingBox: box,
                 blocks: boxBlocks,
-                confidence
+                confidence,
+                inputValue: inputValue || undefined, // Ne pas inclure si vide
+                selectedLabelField,
             };
+
+            console.log(`Created InvoiceElement:`, element);
+
+            return element;
         });
 
-        console.log(`Créé ${invoiceElements.length} éléments de facture`);
+        console.log(`Created ${invoiceElements.length} invoice elements`);
 
-        // Ici, vous pourriez enregistrer les éléments en base de données
-        // const result = await saveInvoiceElements(invoiceElements);
+        // TODO: Enregistrer les éléments en base de données
+        // const result = await saveInvoiceElements(invoiceId, invoiceElements);
 
         return {
             success: true,
             message: "Éléments de facture créés avec succès",
-            elements: invoiceElements
+            elements: invoiceElements,
         };
     } catch (error: any) {
         console.error("Erreur dans makeInvoiceElements:", error);
         return {
             success: false,
-            error: error.message
+            error: error.message,
         };
     }
 }
