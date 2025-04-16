@@ -108,13 +108,13 @@ export default function FormCanvasListDynamique() {
 
     return (
         <div className="p-4">
-            <Button
+            {/* <Button
                 type="button"
                 onClick={addFormCard}
                 className="mb-4 bg-blue-500 hover:bg-blue-600"
             >
                 Ajouter un champ
-            </Button>
+            </Button> */}
             <Button
                 type="button"
                 onClick={clearCardList}
@@ -150,10 +150,10 @@ export default function FormCanvasListDynamique() {
             <form action={modalAction} className="mt-6 space-y-4">
                 <div>
                     <label htmlFor="firmAccountingId" className="block text-sm font-medium mb-1">
-                        ID de la société comptable :
+
                     </label>
                     <input
-                        type="number"
+                        type="hidden"
                         id="firmAccountingId"
                         name="firmAccountingId"
                         defaultValue="1"
@@ -164,10 +164,10 @@ export default function FormCanvasListDynamique() {
                 </div>
                 <div>
                     <label htmlFor="userId" className="block text-sm font-medium mb-1">
-                        ID de l'utilisateur (optionnel) :
+
                     </label>
                     <input
-                        type="number"
+                        type="hidden"
                         id="userId"
                         name="userId"
                         defaultValue="2"
