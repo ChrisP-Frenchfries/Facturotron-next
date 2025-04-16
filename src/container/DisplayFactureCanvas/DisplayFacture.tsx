@@ -3,13 +3,14 @@
 import { invoiceIdAtom, pathFileAtom } from "@/atom/facture.atom";
 import { InvoiceElement, makeInvoiceElements } from "@/utils/canvas.action";
 import { fetchInvoiceImage, fetchInvoiceElements } from "@/utils/facture.action";
-import { useAtom } from "jotai";
+import { useAtom, useAtomValue } from "jotai";
 import { useEffect, useRef, useState, startTransition } from "react";
 import { useActionState } from "react";
 import CanvasDrawing from "./CanvasDrawing";
 import { activeCanvasDrawingAtom, activeInputValueAtom, boundingBoxesAtom, formBoxsAtom } from "@/atom/canvas.atom";
 import BoundingBoxEditor from "./BoundingBoxEditor";
 import BoundingBoxOverlay from "./BoundingBoxOverLay/BoundingBoxOverlay";
+import { trigerSoumettreBoites } from "@/atom/header.atom";
 
 export interface BoundingBox {
     Top: number;
@@ -153,29 +154,17 @@ export default function DisplayFacture() {
         });
     };
 
+    const triggerSubmit = useAtomValue(trigerSoumettreBoites)
+
+    useEffect(() => {
+
+        handleSubmit();
+
+    }, [triggerSubmit]);
+
     return (
         <div>
-            <div>
-                <button
-                    onClick={handleNewDrawing}
-                    className="mt-4 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
-                >
-                    {isActiveDrawing ? "Ne plus dessiner" : "Dessiner des champs"}
-                </button>
-                <button
-                    onClick={handleSubmit}
-                    className="mt-4 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
-                    disabled={isPending}
-                >
-                    {isPending ? "Soumission en cours..." : "Soumettre les boîtes"}
-                </button>
-                <button
-                    onClick={handleShowInputValue}
-                    className="mt-4 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
-                >
-                    {showInputValue ? "Cacher les valeurs" : "Afficher les valeurs"}
-                </button>
-            </div>
+
 
             <div className="facture-display" style={{ userSelect: "none" }}>
                 {imageLoading && <p>Chargement de l'image...</p>}

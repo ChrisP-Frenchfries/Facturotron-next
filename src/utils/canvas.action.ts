@@ -113,7 +113,7 @@ export async function makeInvoiceElements(
             // Définir le selectedLabelField avec typeTextExtract: "Nouveau champ"
             const selectedLabelField: LabelField = {
                 typeTextExtract: "Nouveau champ",
-                label: `Champ ${index + 1}`, // Label par défaut
+                label: `selectionnez un champ`, // Label par défaut
                 couleurDefaut: "bg-red-500", // Bleu par défaut
                 description: "Champ créé automatiquement",
                 isAllowed: true, // Autorisé par défaut

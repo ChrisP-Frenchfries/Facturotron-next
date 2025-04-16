@@ -19,3 +19,13 @@ export const boundingBoxesAtom = atom<BoundingBox[]>([]);
 //Atome panel
 export const activeCanvasDrawingAtom = atom<boolean>(true);
 export const activeInputValueAtom = atom<boolean>(true);
+
+export const submitBoxesAtom = atom(
+    null, // getter (pas utilisé ici)
+    (get, set, callback) => {
+        // Cette fonction sera appelée lors de la mise à jour de l'atome
+        if (typeof callback === 'function') {
+            callback();
+        }
+    }
+);
