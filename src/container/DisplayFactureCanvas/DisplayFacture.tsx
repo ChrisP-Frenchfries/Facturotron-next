@@ -111,6 +111,7 @@ export default function DisplayFacture() {
     // Utilisation de useActionState avec invoiceId inclus via closure
     const [submitState, submitAction, isPending] = useActionState<SubmitResult, BoundingBox[]>(
         async (_previousState: SubmitResult, validBoxes: BoundingBox[]) => {
+            console.log("validbox: ici ce passe mon opération correctement: validbox:", validBoxes)
             if (!invoiceId) {
                 return { success: false, error: "ID de facture manquant" };
             }
