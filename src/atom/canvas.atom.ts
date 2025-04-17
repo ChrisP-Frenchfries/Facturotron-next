@@ -17,8 +17,8 @@ export interface BoundingBox {
 export const boundingBoxesAtom = atom<BoundingBox[]>([]);
 
 //Atome panel
-export const activeCanvasDrawingAtom = atom<boolean>(true);
-export const activeInputValueAtom = atom<boolean>(true);
+export const activeCanvasDrawingAtom = atom<boolean>(false);
+export const activeInputValueAtom = atom<boolean>(false);
 
 export const submitBoxesAtom = atom(
     null, // getter (pas utilisé ici)

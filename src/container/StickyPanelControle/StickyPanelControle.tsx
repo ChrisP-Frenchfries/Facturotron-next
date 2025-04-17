@@ -1,25 +1,15 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useAtom } from "jotai";
 import { useRouter } from "next/navigation";
-import { Button } from "@/components/ui/button";
 import { Filter, Upload, Pencil, Save, Eye, EyeOff, LogOut } from "lucide-react";
 import LabelFieldFilterSheet, { filterOpenAtom } from "../LabelFieldFilterSheet/LabelFieldFilterSheet";
 import UploadForm from "../UploadDocument/UploadForm";
 import { activeCanvasDrawingAtom, activeInputValueAtom } from "@/atom/canvas.atom";
 import { boundingBoxesAtom } from "@/atom/canvas.atom";
 import { trigerSoumettreBoites } from "@/atom/header.atom";
-
-// Palette de couleurs zen
-const zenColors = {
-  primary: "#7FB069",       // Vert clair principal
-  secondary: "#E6F2E1",     // Vert très clair (fond)
-  accent: "#5C8D56",        // Vert plus foncé pour contraste
-  text: "#2C5530",          // Vert foncé pour texte
-  border: "#B8D8BA",        // Vert clair pour bordures
-  hover: "#9BC995",         // Vert clair pour hover
-};
+import { AnimatePresence } from "framer-motion";
 
 export default function StickyPanel() {
   const [, setFilterOpen] = useAtom(filterOpenAtom);
@@ -27,7 +17,25 @@ export default function StickyPanel() {
   const [isActiveDrawing, setIsActiveDrawing] = useAtom(activeCanvasDrawingAtom);
   const [showInputValue, setShowInputValue] = useAtom(activeInputValueAtom);
   const [boundingBoxes] = useAtom(boundingBoxesAtom);
+  const [trigerSoumettre, setTrigerSoumettre] = useAtom(trigerSoumettreBoites);
   const router = useRouter();
+
+  // Persistance des états avec localStorage
+  useEffect(() => {
+    const savedShowUpload = localStorage.getItem('showUpload');
+    const savedShowInputValue = localStorage.getItem('showInputValue');
+
+    if (savedShowUpload) setShowUpload(JSON.parse(savedShowUpload));
+    if (savedShowInputValue) setShowInputValue(JSON.parse(savedShowInputValue));
+  }, []);
+
+  useEffect(() => {
+    localStorage.setItem('showUpload', JSON.stringify(showUpload));
+  }, [showUpload]);
+
+  useEffect(() => {
+    localStorage.setItem('showInputValue', JSON.stringify(showInputValue));
+  }, [showInputValue]);
 
   const handleNewDrawing = () => {
     setIsActiveDrawing(!isActiveDrawing);
@@ -37,63 +45,27 @@ export default function StickyPanel() {
     setShowInputValue(!showInputValue);
   };
 
-  const [trigerSoumettre, setTrigerSoumettre] = useAtom(trigerSoumettreBoites);
-
   const handleTrigerAtom = () => {
     setTrigerSoumettre(!trigerSoumettre);
   };
 
   const handleLogout = () => {
-    // Rediriger vers la racine
     router.push('/');
   };
 
-  // Styles personnalisés pour les boutons zen
-  const zenButtonStyle = (isActive) => ({
-    backgroundColor: isActive ? zenColors.primary : "transparent",
-    color: isActive ? "white" : zenColors.text,
-    border: `1px solid ${isActive ? zenColors.primary : zenColors.border}`,
-    borderRadius: "20px",
-    padding: "6px 16px",
-    fontSize: "14px",
-    display: "flex",
-    alignItems: "center",
-    gap: "8px",
-    transition: "all 0.2s ease",
-    cursor: "pointer",
-    outline: "none",
-  });
-
   return (
     <>
-      <div style={{
-        position: "sticky",
-        top: 0,
-        zIndex: 50,
-        width: "100%",
-        backgroundColor: zenColors.secondary,
-        borderBottom: `1px solid ${zenColors.border}`,
-        boxShadow: "0 2px 10px rgba(0, 0, 0, 0.05)"
-      }}>
-        <div style={{
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "space-between",
-          height: "64px",
-          padding: "0 16px"
-        }}>
+      <div className="sticky top-0 z-50 w-full bg-[#E6F2E1] border-b border-[#B8D8BA] shadow-sm">
+        <div className="flex items-center justify-between h-16 px-4">
           {/* Boutons à gauche */}
-          <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
+          <div className="flex items-center gap-3">
             {/* Bouton Dessiner */}
             <button
               onClick={handleNewDrawing}
-              style={zenButtonStyle(isActiveDrawing)}
-              onMouseEnter={(e) => {
-                if (!isActiveDrawing) e.currentTarget.style.backgroundColor = zenColors.hover;
-              }}
-              onMouseLeave={(e) => {
-                if (!isActiveDrawing) e.currentTarget.style.backgroundColor = "transparent";
-              }}
+              className={`flex items-center gap-2 px-4 py-1.5 text-sm rounded-full transition-all duration-200 
+                ${isActiveDrawing
+                  ? "bg-[#7FB069] text-white border border-[#7FB069]"
+                  : "bg-transparent text-[#2C5530] border border-[#B8D8BA] hover:bg-[#9BC995]"}`}
             >
               <Pencil size={16} />
               <span>{isActiveDrawing ? "Arrêter dessin" : "Dessiner"}</span>
@@ -103,9 +75,7 @@ export default function StickyPanel() {
             {isActiveDrawing && (
               <button
                 onClick={handleTrigerAtom}
-                style={zenButtonStyle(false)}
-                onMouseEnter={(e) => e.currentTarget.style.backgroundColor = zenColors.hover}
-                onMouseLeave={(e) => e.currentTarget.style.backgroundColor = "transparent"}
+                className="flex items-center gap-2 px-4 py-1.5 text-sm rounded-full bg-transparent text-[#2C5530] border border-[#B8D8BA] hover:bg-[#9BC995] transition-all duration-200"
               >
                 <Save size={16} />
                 <span>Soumettre les boîtes</span>
@@ -115,9 +85,7 @@ export default function StickyPanel() {
             {/* Bouton Afficher/Masquer valeurs */}
             <button
               onClick={handleShowInputValue}
-              style={zenButtonStyle(false)}
-              onMouseEnter={(e) => e.currentTarget.style.backgroundColor = zenColors.hover}
-              onMouseLeave={(e) => e.currentTarget.style.backgroundColor = "transparent"}
+              className="flex items-center gap-2 px-4 py-1.5 text-sm rounded-full bg-transparent text-[#2C5530] border border-[#B8D8BA] hover:bg-[#9BC995] transition-all duration-200"
             >
               {showInputValue ? <EyeOff size={16} /> : <Eye size={16} />}
               <span>{showInputValue ? "Masquer valeurs" : "Afficher valeurs"}</span>
@@ -126,9 +94,7 @@ export default function StickyPanel() {
             {/* Bouton Filtres */}
             <button
               onClick={() => setFilterOpen(true)}
-              style={zenButtonStyle(false)}
-              onMouseEnter={(e) => e.currentTarget.style.backgroundColor = zenColors.hover}
-              onMouseLeave={(e) => e.currentTarget.style.backgroundColor = "transparent"}
+              className="flex items-center gap-2 px-4 py-1.5 text-sm rounded-full bg-transparent text-[#2C5530] border border-[#B8D8BA] hover:bg-[#9BC995] transition-all duration-200"
             >
               <Filter size={16} />
               <span>Filtres</span>
@@ -137,12 +103,13 @@ export default function StickyPanel() {
             {/* Bouton Upload */}
             <button
               onClick={() => setShowUpload(!showUpload)}
-              style={zenButtonStyle(false)}
-              onMouseEnter={(e) => e.currentTarget.style.backgroundColor = zenColors.hover}
-              onMouseLeave={(e) => e.currentTarget.style.backgroundColor = "transparent"}
+              className={`flex items-center gap-2 px-4 py-1.5 text-sm rounded-full transition-all duration-200 
+                ${showUpload
+                  ? "bg-[#7FB069] text-white border border-[#7FB069]"
+                  : "bg-transparent text-[#2C5530] border border-[#B8D8BA] hover:bg-[#9BC995]"}`}
             >
               <Upload size={16} />
-              <span>Upload</span>
+              <span>{showUpload ? "Fermer" : "Upload"}</span>
             </button>
           </div>
 
@@ -150,9 +117,7 @@ export default function StickyPanel() {
           <div>
             <button
               onClick={handleLogout}
-              style={zenButtonStyle(false)}
-              onMouseEnter={(e) => e.currentTarget.style.backgroundColor = zenColors.hover}
-              onMouseLeave={(e) => e.currentTarget.style.backgroundColor = "transparent"}
+              className="flex items-center gap-2 px-4 py-1.5 text-sm rounded-full bg-transparent text-[#2C5530] border border-[#B8D8BA] hover:bg-[#9BC995] transition-all duration-200"
             >
               <LogOut size={16} />
               <span>Déconnexion</span>
@@ -161,16 +126,12 @@ export default function StickyPanel() {
         </div>
       </div>
 
-      {/* Afficher le formulaire d'upload si showUpload est true */}
-      {showUpload && (
-        <div style={{
-          padding: "20px",
-          backgroundColor: zenColors.secondary,
-          borderBottom: `1px solid ${zenColors.border}`
-        }}>
-          <UploadForm />
-        </div>
-      )}
+      {/* Formulaire d'upload avec animation de fermeture */}
+      <div className="sticky top-16 z-40 w-full">
+        <AnimatePresence>
+          {showUpload && <UploadForm />}
+        </AnimatePresence>
+      </div>
 
       {/* Composant de filtre (s'affiche via son propre état) */}
       <LabelFieldFilterSheet />

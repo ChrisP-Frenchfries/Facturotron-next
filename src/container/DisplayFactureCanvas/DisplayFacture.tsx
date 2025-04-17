@@ -47,6 +47,7 @@ export default function DisplayFacture() {
 
     const imageRef = useRef<HTMLImageElement | null>(null);
 
+    // Logique de chargement de l'image et des éléments (inchangée)
     useEffect(() => {
         if (!pathFile) {
             setImageUrl(null);
@@ -106,6 +107,7 @@ export default function DisplayFacture() {
         };
     }, [pathFile, invoiceId, setformBoxs]);
 
+    // Logique de soumission et autres fonctionnalités (inchangée)
     const [submitState, submitAction, isPending] = useActionState<SubmitResult, BoundingBox[]>(
         async (_previousState: SubmitResult, validBoxes: BoundingBox[]) => {
             if (!invoiceId) {
@@ -121,7 +123,6 @@ export default function DisplayFacture() {
         if (submitState?.success && Array.isArray(submitState.elements)) {
             console.log("Updating formBoxs with:", submitState.elements);
             setformBoxs((prev) => {
-                // Éviter les mises à jour si les données sont identiques
                 const newElements = submitState.elements!;
                 if (
                     prev.length === newElements.length &&
@@ -154,47 +155,54 @@ export default function DisplayFacture() {
         });
     };
 
-    const triggerSubmit = useAtomValue(trigerSoumettreBoites)
+    const triggerSubmit = useAtomValue(trigerSoumettreBoites);
 
     useEffect(() => {
-
         handleSubmit();
-
     }, [triggerSubmit]);
 
     return (
-        <div>
-
-
-            <div className="facture-display" style={{ userSelect: "none" }}>
-                {imageLoading && <p>Chargement de l'image...</p>}
-                {imageError && <p className="error">Erreur : {imageError}</p>}
-                {imageUrl && !imageLoading && (
-                    <div style={{ position: "relative", display: "inline-block" }}>
-                        <img
-                            ref={imageRef}
-                            src={imageUrl}
-                            alt={`Facture ${invoiceId || ""}`}
-                            style={{ maxWidth: "100%", height: "auto" }}
-                            draggable={false}
-                            onError={() => {
-                                setImageError("Erreur lors du chargement de l'image");
-                                setImageUrl(null);
-                            }}
-                        />
-                        <CanvasDrawing
-                            imageRef={imageRef}
-                            boundingBoxes={boundingBoxes}
-                            setBoundingBoxes={setBoundingBoxes}
-                        />
-                        <BoundingBoxOverlay imageRef={imageRef} />
-                        <BoundingBoxEditor imageRef={imageRef} />
-                    </div>
-                )}
-                {!pathFile && !imageLoading && <p>Aucune facture sélectionnée</p>}
-                {submitState && !submitState.success && <p className="error">Erreur : {submitState.error}</p>}
-                {submitState && submitState.success && <p className="success">Succès : {submitState.message}</p>}
-            </div>
+        <div className="facture-display" style={{ userSelect: "none", height: "100%", width: "100%" }}>
+            {imageLoading && <p>Chargement de l'image...</p>}
+            {imageError && <p className="error">Erreur : {imageError}</p>}
+            {imageUrl && !imageLoading && (
+                <div
+                    style={{
+                        position: "relative",
+                        width: "100%",
+                        height: "100%",
+                        overflow: "auto", // Défilement si l'image dépasse
+                        display: "flex",
+                        justifyContent: "center",
+                        alignItems: "flex-start",
+                    }}
+                >
+                    <img
+                        ref={imageRef}
+                        src={imageUrl}
+                        alt={`Facture ${invoiceId || ""}`}
+                        style={{
+                            width: "100%",
+                            height: "auto",
+                        }}
+                        draggable={false}
+                        onError={() => {
+                            setImageError("Erreur lors du chargement de l'image");
+                            setImageUrl(null);
+                        }}
+                    />
+                    <CanvasDrawing
+                        imageRef={imageRef}
+                        boundingBoxes={boundingBoxes}
+                        setBoundingBoxes={setBoundingBoxes}
+                    />
+                    <BoundingBoxOverlay imageRef={imageRef} />
+                    {/* <BoundingBoxEditor imageRef={imageRef} /> pour plus tard */}
+                </div>
+            )}
+            {!pathFile && !imageLoading && <p>Aucune facture sélectionnée</p>}
+            {submitState && !submitState.success && <p className="error">Erreur : {submitState.error}</p>}
+            {submitState && submitState.success && <p className="success">Succès : {submitState.message}</p>}
         </div>
     );
 }
