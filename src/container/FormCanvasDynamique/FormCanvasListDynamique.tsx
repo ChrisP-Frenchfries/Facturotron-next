@@ -9,6 +9,7 @@ import { formBoxsAtom } from "@/atom/canvas.atom";
 import { formAddInvoiceElement, getReadyForPrintAction, generateCsvFromReadyForPrint } from "@/utils/facture.action";
 import { allowedLabelFieldsAtom, invoiceElementFinalRawAtom, invoiceIdAtom } from "@/atom/facture.atom";
 import PrintDataModal from "../PrintDataModal/PrintDataModal";
+import { Table, Check } from "lucide-react";
 
 // Interface pour LabelField (correspond à la structure de labelFields.json)
 export interface LabelField {
@@ -107,104 +108,90 @@ export default function FormCanvasListDynamique() {
     });
 
     return (
-        <div className="p-4">
-            {/* <Button
-                type="button"
-                onClick={addFormCard}
-                className="mb-4 bg-blue-500 hover:bg-blue-600"
-            >
-                Ajouter un champ
-            </Button> */}
-            <Button
-                type="button"
-                onClick={clearCardList}
-                className="mb-4 bg-blue-500 hover:bg-blue-600"
-            >
-                Clear all
-            </Button>
-            <form action={formAction} className="space-y-6">
-                <input type="hidden" name="invoiceId" value={invoiceId ? String(invoiceId) : ""} />
-                <input type="hidden" name="formBoxs" value={JSON.stringify(formBoxs)} />
-                <div className="space-y-4">
-                    {filteredFormBoxs.length === 0 ? (
-                        <p className="text-muted-foreground">
-                            Aucun champ pour l'instant. Ajoutez-en un pour commencer.
-                        </p>
-                    ) : (
-                        filteredFormBoxs.map((element) => (
-                            <FormCardInputDynamique key={element.id} {...element} />
-                        ))
-                    )}
-                </div>
-                {formBoxs.length > 0 && (
+        <div className="p-4 bg-[#E6F2E1] border-l border-[#B8D8BA] h-[calc(100vh-80px)] overflow-y-auto shadow-sm flex flex-col">
+            {/* Mini-header sticky au-dessus avec hauteur réduite */}
+            <div className="sticky top-0 z-10 flex items-center justify-between bg-[#E6F2E1] border-b border-[#B8D8BA] py-1.5">
+                <div className="flex items-center gap-2">
+                    <h3 className="text-lg font-semibold text-[#2C5530]">Formulaire</h3>
                     <Button
                         type="submit"
-                        className="w-full bg-green-500 hover:bg-green-600"
-                        disabled={isPending}
+                        form="dataForm"
+                        className="px-3 py-1.5 text-sm rounded-full bg-transparent text-[#2C5530] border border-[#B8D8BA] hover:bg-[#9BC995] transition-all duration-200 min-w-[140px]"
+                        disabled={isModalPending}
                     >
-                        {isPending ? "Soumission..." : "Soumettre le formulaire"}
+                        <Table size={16} className="mr-1" />
+                        {isModalPending ? "Chargement..." : "Consulter les datas"}
                     </Button>
+                    <Button
+                        onClick={handleClickPrint}
+                        disabled={isPrintPending}
+                        className="px-3 py-1.5 text-sm rounded-full bg-transparent text-[#2C5530] border border-[#B8D8BA] hover:bg-[#9BC995] transition-all duration-200 min-w-[120px]"
+                    >
+                        {isPrintPending ? "Chargement..." : "Télécharger CSV"}
+                    </Button>
+                </div>
+                <div className="flex items-center gap-2">
+                    <Button
+                        type="button"
+                        onClick={clearCardList}
+                        className="px-3 py-1.5 text-sm rounded-full bg-transparent text-[#2C5530] border border-[#B8D8BA] hover:bg-[#9BC995] transition-all duration-200 min-w-[100px]"
+                    >
+                        Vider tout
+                    </Button>
+                    {formBoxs.length > 0 && (
+                        <Button
+                            type="submit"
+                            form="submitForm"
+                            className="px-3 py-1.5 text-sm rounded-full bg-[#7FB069] text-white border border-[#7FB069] hover:bg-[#6CA052] transition-all duration-200 min-w-[160px]"
+                            disabled={isPending}
+                        >
+                            <Check size={16} className="mr-1" />
+                            {isPending ? "Validation..." : "Valider cette facture"}
+                        </Button>
+                    )}
+                </div>
+            </div>
+
+            <form id="dataForm" action={modalAction} className="hidden">
+                <input type="hidden" name="firmAccountingId" defaultValue="1" required />
+                <input type="hidden" name="userId" defaultValue="2" />
+            </form>
+
+            <form id="submitForm" action={formAction} className="hidden">
+                <input type="hidden" name="invoiceId" value={invoiceId ? String(invoiceId) : ""} />
+                <input type="hidden" name="formBoxs" value={JSON.stringify(formBoxs)} />
+            </form>
+
+            {/* Contenu principal avec espace maximisé pour la liste */}
+            <div className="flex flex-col gap-3 flex-grow overflow-y-auto mt-2">
+                {filteredFormBoxs.length === 0 ? (
+                    <p className="text-sm text-[#2C5530] opacity-70">
+                        Aucun champ pour l'instant. Ajoutez-en un pour commencer.
+                    </p>
+                ) : (
+                    filteredFormBoxs.map((element) => (
+                        <FormCardInputDynamique key={element.id} {...element} />
+                    ))
                 )}
-                {state?.message && <p className="mt-2 text-sm text-red-500">{state.message}</p>}
-            </form>
-            <form action={modalAction} className="mt-6 space-y-4">
-                <div>
-                    <label htmlFor="firmAccountingId" className="block text-sm font-medium mb-1">
+            </div>
 
-                    </label>
-                    <input
-                        type="hidden"
-                        id="firmAccountingId"
-                        name="firmAccountingId"
-                        defaultValue="1"
-                        required
-                        className="w-full p-2 border border-gray-300 rounded"
-                        placeholder="Entrez l'ID de la société"
-                    />
-                </div>
-                <div>
-                    <label htmlFor="userId" className="block text-sm font-medium mb-1">
-
-                    </label>
-                    <input
-                        type="hidden"
-                        id="userId"
-                        name="userId"
-                        defaultValue="2"
-                        className="w-full p-2 border border-gray-300 rounded"
-                        placeholder="Entrez l'ID de l'utilisateur (facultatif)"
-                    />
-                </div>
-                <Button
-                    type="submit"
-                    className="w-full bg-purple-500 hover:bg-purple-600"
-                    disabled={isModalPending}
-                >
-                    {isModalPending ? "Chargement des données..." : "Récupérer données impression"}
-                </Button>
-            </form>
+            {/* Messages d'erreur et modale */}
+            {state?.message && <p className="mt-2 text-sm text-red-600">{state.message}</p>}
             {modalState.error && (
-                <p className="mt-2 text-sm text-red-500">Erreur : {modalState.error}</p>
+                <p className="mt-2 text-sm text-red-600">Erreur : {modalState.error}</p>
             )}
             {modalState.success && modalState.message && modalState.data.length === 0 && (
-                <p className="mt-2 text-sm text-blue-500">{modalState.message}</p>
+                <p className="mt-2 text-sm text-[#2C5530] opacity-70">{modalState.message}</p>
             )}
             {printState.error && (
-                <p className="mt-2 text-sm text-red-500">Erreur : {printState.error}</p>
+                <p className="mt-2 text-sm text-red-600">Erreur : {printState.error}</p>
             )}
             {printState.success && printState.data.length === 0 && !printState.message && (
-                <p className="mt-2 text-sm text-gray-500">
+                <p className="mt-2 text-sm text-[#2C5530] opacity-70">
                     Aucune facture trouvée pour cette société comptable.
                 </p>
             )}
             {isModalOpen && <PrintDataModal data={modalState.data} onClose={closeModal} />}
-            <Button
-                onClick={handleClickPrint}
-                disabled={isPrintPending}
-                className="mt-4 bg-blue-500 hover:bg-blue-600"
-            >
-                {isPrintPending ? "Chargement..." : "Télécharger le CSV"}
-            </Button>
         </div>
     );
 }

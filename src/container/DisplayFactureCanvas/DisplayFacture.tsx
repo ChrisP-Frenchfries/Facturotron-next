@@ -183,7 +183,7 @@ export default function DisplayFacture() {
                         alt={`Facture ${invoiceId || ""}`}
                         style={{
                             width: "100%",
-                            height: "auto",
+                            height: "100%",
                         }}
                         draggable={false}
                         onError={() => {

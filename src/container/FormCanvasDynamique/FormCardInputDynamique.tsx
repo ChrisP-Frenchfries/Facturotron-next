@@ -1,6 +1,5 @@
 "use client";
 
-import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import React, { useMemo, useEffect } from "react";
@@ -18,16 +17,14 @@ export default function FormCardInputDynamique({
   id,
   blocks,
   boundingBox,
-  inputValue: initialInputValue, // Récupérer inputValue des props
-  selectedLabelField: initialSelectedLabelField, // Récupérer selectedLabelField des props
+  inputValue: initialInputValue,
+  selectedLabelField: initialSelectedLabelField,
 }: InvoiceElement) {
   const [formBoxs, setFormBoxs] = useAtom(formBoxsAtom);
   const currentElement = formBoxs.find((element) => element.id === id);
 
-  // Utiliser inputValue des props comme valeur initiale, avec fallback sur blocks si nécessaire
   const initialTextValue = initialInputValue ?? blocks?.[0]?.Text ?? "";
 
-  // Créer les atomes localement
   const boundingBoxAtom = useMemo(
     () => createDynamicAtom<BoundingBox>(`${id}-boundingBox`, boundingBox),
     [id, boundingBox]
@@ -57,7 +54,6 @@ export default function FormCardInputDynamique({
   console.log("inputValue:", inputValue);
   console.log("selectedLabelField:", selectedLabelField);
 
-  // Synchroniser avec formBoxsAtom uniquement si les valeurs ont changé
   useEffect(() => {
     setFormBoxs((prev) =>
       prev.map((element) =>
@@ -75,25 +71,30 @@ export default function FormCardInputDynamique({
   };
 
   return (
-    <Card
-      className={cn(
-        `p-4 w-full max-w-md ${selectedLabelField?.couleurDefaut || ""}`
-      )}
-    >
-      <div className="space-y-1">
-        <div className="flex flex-col gap-2">
-          <LabelFieldSelector atom={selectedLabelFieldAtom} />
-        </div>
-        <div className="flex flex-col gap-2">
-          <Input
-            id={`input-${id}`}
-            value={inputValue}
-            onChange={handleInputChange}
-            placeholder="Entrez ou modifiez la valeur"
-            className="w-full font-medium bg-white"
-          />
-        </div>
-      </div>
-    </Card>
+    <div className="flex flex-row items-center gap-2 max-w-md border-b border-[#B8D8BA] py-2">
+      <div
+        className={cn(
+          "h-4 w-4",
+          selectedLabelField?.couleurDefaut || "bg-gray-200"
+        )}
+      ></div>
+      <LabelFieldSelector atom={selectedLabelFieldAtom} />
+      <div className="border-r border-[#B8D8BA] h-6"></div>
+      <Input
+        id={`input-${id}`}
+        value={inputValue}
+        onChange={handleInputChange}
+        placeholder="Entrez ou modifiez la valeur"
+        className={cn(
+          "w-full font-medium border-none shadow-none",
+          selectedLabelField?.couleurDefaut
+            ? `bg-[${selectedLabelField.couleurDefaut}] bg-opacity-20`
+            : "bg-white"
+        )}
+        style={{
+          color: selectedLabelField?.couleurDefaut || "inherit",
+        }}
+      />
+    </div>
   );
 }
