@@ -9,7 +9,7 @@ import { formBoxsAtom } from "@/atom/canvas.atom";
 import { formAddInvoiceElement, getReadyForPrintAction, generateCsvFromReadyForPrint } from "@/utils/facture.action";
 import { allowedLabelFieldsAtom, invoiceElementFinalRawAtom, invoiceIdAtom } from "@/atom/facture.atom";
 import PrintDataModal from "../PrintDataModal/PrintDataModal";
-import { Table, Check } from "lucide-react";
+import { Table, Check, Save, Trash2 } from "lucide-react";
 
 // Interface pour LabelField (correspond à la structure de labelFields.json)
 export interface LabelField {
@@ -112,41 +112,43 @@ export default function FormCanvasListDynamique() {
             {/* Mini-header sticky au-dessus avec hauteur réduite */}
             <div className="sticky top-0 z-10 flex items-center justify-between bg-[#E6F2E1] border-b border-[#B8D8BA] py-1.5">
                 <div className="flex items-center gap-2">
-                    <h3 className="text-lg font-semibold text-[#2C5530]">Formulaire</h3>
+                    <h3 className="text-lg font-semibold text-[#2C5530] hidden sm:block">Formulaire</h3>
                     <Button
                         type="submit"
                         form="dataForm"
-                        className="px-3 py-1.5 text-sm rounded-full bg-transparent text-[#2C5530] border border-[#B8D8BA] hover:bg-[#9BC995] transition-all duration-200 min-w-[140px]"
+                        className="px-3 py-1.5 text-sm rounded-full bg-transparent text-[#2C5530] border border-[#B8D8BA] hover:bg-[#9BC995] transition-all duration-200 min-w-[40px] sm:min-w-[140px]"
                         disabled={isModalPending}
                     >
-                        <Table size={16} className="mr-1" />
-                        {isModalPending ? "Chargement..." : "Consulter les datas"}
+                        <Table size={16} className="mr-1 sm:mr-1" />
+                        <span className="hidden sm:inline">{isModalPending ? "Chargement..." : "Consulter les datas"}</span>
                     </Button>
                     <Button
                         onClick={handleClickPrint}
                         disabled={isPrintPending}
-                        className="px-3 py-1.5 text-sm rounded-full bg-transparent text-[#2C5530] border border-[#B8D8BA] hover:bg-[#9BC995] transition-all duration-200 min-w-[120px]"
+                        className="px-3 py-1.5 text-sm rounded-full bg-transparent text-[#2C5530] border border-[#B8D8BA] hover:bg-[#9BC995] transition-all duration-200 min-w-[40px] sm:min-w-[120px]"
                     >
-                        {isPrintPending ? "Chargement..." : "Télécharger CSV"}
+                        <Save size={16} className="mr-1 sm:mr-1" />
+                        <span className="hidden sm:inline">{isPrintPending ? "Chargement..." : "Télécharger CSV"}</span>
                     </Button>
                 </div>
                 <div className="flex items-center gap-2">
                     <Button
                         type="button"
                         onClick={clearCardList}
-                        className="px-3 py-1.5 text-sm rounded-full bg-transparent text-[#2C5530] border border-[#B8D8BA] hover:bg-[#9BC995] transition-all duration-200 min-w-[100px]"
+                        className="px-3 py-1.5 text-sm rounded-full bg-transparent text-[#2C5530] border border-[#B8D8BA] hover:bg-[#9BC995] transition-all duration-200 min-w-[40px] sm:min-w-[100px]"
                     >
-                        Vider tout
+                        <Trash2 size={16} className="mr-1 sm:mr-1" />
+                        <span className="hidden sm:inline">Vider tout</span>
                     </Button>
                     {formBoxs.length > 0 && (
                         <Button
                             type="submit"
                             form="submitForm"
-                            className="px-3 py-1.5 text-sm rounded-full bg-[#7FB069] text-white border border-[#7FB069] hover:bg-[#6CA052] transition-all duration-200 min-w-[160px]"
+                            className="px-3 py-1.5 text-sm rounded-full bg-[#7FB069] text-white border border-[#7FB069] hover:bg-[#6CA052] transition-all duration-200 min-w-[40px] sm:min-w-[160px]"
                             disabled={isPending}
                         >
                             <Check size={16} className="mr-1" />
-                            {isPending ? "Validation..." : "Valider cette facture"}
+                            <span className="sm:inline">{isPending ? "Validation..." : "Valider"}</span>
                         </Button>
                     )}
                 </div>

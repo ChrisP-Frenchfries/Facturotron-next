@@ -65,7 +65,7 @@ export default function LabelFieldSelector({ atom }: LabelFieldSelectorProps) {
                         variant="outline"
                         role="combobox"
                         aria-expanded={open}
-                        className="w-full justify-between"
+                        className="w-full justify-between bg-transparent border-none text-[#2C5530] hover:bg-[#9BC995] transition-all duration-200 shadow-none"
                     >
                         {value ? value : "Sélectionner un champ..."}
                         <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
@@ -73,7 +73,10 @@ export default function LabelFieldSelector({ atom }: LabelFieldSelectorProps) {
                 </PopoverTrigger>
                 <PopoverContent className="w-full p-0">
                     <Command>
-                        <CommandInput placeholder="Rechercher un champ..." className="h-9" />
+                        <CommandInput
+                            placeholder="Rechercher un champ..."
+                            className="h-9 border-none bg-transparent text-[#2C5530] placeholder:text-[#2C5530] placeholder:opacity-50 shadow-none"
+                        />
                         <CommandList>
                             <CommandEmpty>Aucun champ trouvé.</CommandEmpty>
                             <CommandGroup>
