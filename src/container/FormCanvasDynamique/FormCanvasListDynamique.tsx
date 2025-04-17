@@ -165,7 +165,7 @@ export default function FormCanvasListDynamique() {
             </form>
 
             {/* Contenu principal avec espace maximisé pour la liste */}
-            <div className="flex flex-col gap-3 flex-grow overflow-y-auto mt-2">
+            <div className="flex flex-col  flex-grow overflow-y-auto mt-2">
                 {filteredFormBoxs.length === 0 ? (
                     <p className="text-sm text-[#2C5530] opacity-70">
                         Aucun champ pour l'instant. Ajoutez-en un pour commencer.

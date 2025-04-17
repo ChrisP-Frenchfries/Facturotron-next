@@ -71,7 +71,7 @@ export default function FormCardInputDynamique({
   };
 
   return (
-    <div className="flex flex-row items-center gap-2 max-w-md border-b border-[#B8D8BA] py-2">
+    <div className="flex flex-row items-center gap- max-w-md border-b border-[#B8D8BA] py-2">
       <div
         className={cn(
           "h-4 w-4",
